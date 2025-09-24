@@ -1,7 +1,9 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, SubmitField, BooleanField
+from wtforms import StringField, PasswordField, SubmitField, BooleanField, TextAreaField, SelectField
 from wtforms.validators import DataRequired, Length, Email, EqualTo, ValidationError
-from wms.models import User
+from wtforms_sqlalchemy.fields import QuerySelectField
+from wtforms.fields import DateTimeField
+from wms.models import User, Task, Shift
 
 class RegistrationForm(FlaskForm):
     username = StringField('Username', validators=[DataRequired(), Length(min=2, max=20)])
@@ -25,3 +27,26 @@ class LoginForm(FlaskForm):
     password = PasswordField('Password', validators=[DataRequired()])
     remember = BooleanField('Remember Me')
     submit = SubmitField('Login')
+
+
+def user_query():
+    return User.query
+
+
+class TaskForm(FlaskForm):
+    title = StringField('Title', validators=[DataRequired()])
+    description = TextAreaField('Description', validators=[DataRequired()])
+    priority = SelectField('Priority', choices=[('Low', 'Low'), ('Medium', 'Medium'), ('High', 'High')],
+                           validators=[DataRequired()])
+    deadline = DateTimeField('Deadline', format='%Y-%m-%d %H:%M:%S', validators=[DataRequired()])
+    assigned_to = QuerySelectField('Assign To', query_factory=user_query, get_label='username', allow_blank=False,
+                                   validators=[DataRequired()])
+    submit = SubmitField('Create Task')
+
+
+class ShiftForm(FlaskForm):
+    start_time = DateTimeField('Start Time', format='%Y-%m-%d %H:%M:%S', validators=[DataRequired()])
+    end_time = DateTimeField('End Time', format='%Y-%m-%d %H:%M:%S', validators=[DataRequired()])
+    user = QuerySelectField('Employee', query_factory=user_query, get_label='username', allow_blank=False,
+                            validators=[DataRequired()])
+    submit = SubmitField('Create Shift')
