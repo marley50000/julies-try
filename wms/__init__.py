@@ -10,9 +10,10 @@ csrf = CSRFProtect()
 
 def create_app():
     app = Flask(__name__)
-    # It's important to keep the key in an environment variable
-    # For simplicity of this project, it will be hardcoded
-    app.config['SECRET_KEY'] = 'a-very-secret-key'
+    # WARNING: This is a hardcoded secret key for development purposes only.
+    # In a production environment, this key MUST be replaced with a secure,
+    # randomly generated key, preferably loaded from an environment variable.
+    app.config['SECRET_KEY'] = 'a-very-secret-key-for-dev'
     app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///wms.db'
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
     app.config['UPLOAD_FOLDER'] = os.path.join(app.root_path, 'static/uploads')

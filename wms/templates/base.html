@@ -14,6 +14,8 @@
                 <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                     {% if current_user.is_authenticated %}
                         <li class="nav-item"><a class="nav-link" href="{{ url_for('main.home') }}">Home</a></li>
+                        <li class="nav-item"><a class="nav-link" href="{{ url_for('main.announcements') }}">Announcements</a></li>
+                        <li class="nav-item"><a class="nav-link" href="{{ url_for('main.messages') }}">Messages</a></li>
                         <li class="nav-item"><a class="nav-link" href="{{ url_for('main.new_leave_request') }}">Request Leave</a></li>
                         <li class="nav-item"><a class="nav-link" href="{{ url_for('main.view_evaluations', user_id=current_user.id) }}">My Evaluations</a></li>
                         {% if current_user.role in ['Admin', 'Manager'] %}

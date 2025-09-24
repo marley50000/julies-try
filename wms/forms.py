@@ -6,7 +6,7 @@ from wtforms import FloatField
 from wtforms.fields import DateField, DateTimeField
 from wtforms.validators import Optional, NumberRange
 from flask_wtf.file import FileField, FileAllowed
-from wms.models import User, Task, Shift, LeaveRequest, Salary, Document, Goal, Evaluation
+from wms.models import User, Task, Shift, LeaveRequest, Salary, Document, Goal, Evaluation, Announcement, Message
 
 class RegistrationForm(FlaskForm):
     username = StringField('Username', validators=[DataRequired(), Length(min=2, max=20)])
@@ -94,3 +94,14 @@ class EvaluationForm(FlaskForm):
     rating = SelectField('Rating', choices=[(1, '1'), (2, '2'), (3, '3'), (4, '4'), (5, '5')], coerce=int,
                          validators=[DataRequired(), NumberRange(min=1, max=5)])
     submit = SubmitField('Submit Evaluation')
+
+
+class AnnouncementForm(FlaskForm):
+    title = StringField('Title', validators=[DataRequired()])
+    content = TextAreaField('Content', validators=[DataRequired()])
+    submit = SubmitField('Post Announcement')
+
+
+class MessageForm(FlaskForm):
+    content = TextAreaField('Message', validators=[DataRequired()])
+    submit = SubmitField('Send')

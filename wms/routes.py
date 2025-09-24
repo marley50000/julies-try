@@ -2,13 +2,15 @@ from flask import render_template, url_for, flash, redirect, request, Blueprint,
 from flask_login import login_user, current_user, logout_user, login_required
 from wms import db
 import datetime
+import os
 
-from wms.models import User, Task, Shift, Attendance, LeaveRequest, Salary, Document, Goal, Evaluation
-from wms.forms import RegistrationForm, LoginForm, TaskForm, ShiftForm, LeaveRequestForm, EmptyForm, SalaryForm, DocumentForm, GoalForm, EvaluationForm
+from wms.models import User, Task, Shift, Attendance, LeaveRequest, Salary, Document, Goal, Evaluation, Announcement, Message
+from wms.forms import RegistrationForm, LoginForm, TaskForm, ShiftForm, LeaveRequestForm, EmptyForm, SalaryForm, DocumentForm, GoalForm, EvaluationForm, AnnouncementForm, MessageForm
 from .decorators import roles_required
 from .payroll import calculate_overtime
 from werkzeug.utils import secure_filename
 from flask import current_app
+from sqlalchemy import or_
 
 main_bp = Blueprint('main', __name__)
 
@@ -322,3 +324,63 @@ def view_evaluations(user_id):
 
     evaluations = user.evaluations_received
     return render_template('view_evaluations.html', title='View Evaluations', user=user, evaluations=evaluations)
+
+
+@main_bp.route("/announcements")
+@login_required
+def announcements():
+    all_announcements = Announcement.query.order_by(Announcement.date_posted.desc()).all()
+    return render_template('announcements.html', title='Announcements', announcements=all_announcements)
+
+
+@main_bp.route("/announcement/new", methods=['GET', 'POST'])
+@login_required
+@roles_required('Admin', 'Manager')
+def new_announcement():
+    form = AnnouncementForm()
+    if form.validate_on_submit():
+        announcement = Announcement(title=form.title.data,
+                                    content=form.content.data,
+                                    user=current_user)
+        db.session.add(announcement)
+        db.session.commit()
+        flash('Your announcement has been posted.', 'success')
+        return redirect(url_for('main.announcements'))
+    return render_template('create_announcement.html', title='New Announcement', form=form)
+
+
+@main_bp.route("/messages")
+@login_required
+def messages():
+    # Get all users the current user has had a conversation with
+    sent_to = db.session.query(Message.recipient_id).filter(Message.sender_id == current_user.id)
+    received_from = db.session.query(Message.sender_id).filter(Message.recipient_id == current_user.id)
+    user_ids_with_conversations = list(set([item[0] for item in sent_to.union(received_from)]))
+
+    conversations = User.query.filter(User.id.in_(user_ids_with_conversations)).all()
+    all_users = User.query.filter(User.id != current_user.id).all()
+
+    return render_template('messages.html', title='Messages', conversations=conversations, all_users=all_users)
+
+
+@main_bp.route("/messages/<int:recipient_id>", methods=['GET', 'POST'])
+@login_required
+def conversation(recipient_id):
+    recipient = User.query.get_or_404(recipient_id)
+    form = MessageForm()
+    if form.validate_on_submit():
+        msg = Message(content=form.content.data,
+                      sender=current_user,
+                      recipient=recipient)
+        db.session.add(msg)
+        db.session.commit()
+        return redirect(url_for('main.conversation', recipient_id=recipient_id))
+
+    messages = Message.query.filter(
+        or_(
+            (Message.sender_id == current_user.id) & (Message.recipient_id == recipient_id),
+            (Message.sender_id == recipient_id) & (Message.recipient_id == current_user.id)
+        )
+    ).order_by(Message.timestamp.asc()).all()
+
+    return render_template('conversation.html', title=f"Conversation with {recipient.username}", form=form, recipient=recipient, messages=messages)

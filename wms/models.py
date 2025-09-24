@@ -126,3 +126,29 @@ class Evaluation(db.Model):
 
     def __repr__(self):
         return f"Evaluation for '{self.employee.username}' by '{self.author.username}'"
+
+
+class Announcement(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    title = db.Column(db.String(100), nullable=False)
+    content = db.Column(Text, nullable=False)
+    date_posted = db.Column(db.DateTime, nullable=False, default=datetime.datetime.utcnow)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    user = db.relationship('User', backref='announcements')
+
+    def __repr__(self):
+        return f"Announcement('{self.title}', '{self.date_posted}')"
+
+
+class Message(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    content = db.Column(Text, nullable=False)
+    timestamp = db.Column(db.DateTime, nullable=False, default=datetime.datetime.utcnow)
+    sender_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    recipient_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+
+    sender = db.relationship('User', foreign_keys=[sender_id], backref='sent_messages')
+    recipient = db.relationship('User', foreign_keys=[recipient_id], backref='received_messages')
+
+    def __repr__(self):
+        return f"Message from '{self.sender.username}' to '{self.recipient.username}'"
