@@ -1,0 +1,26 @@
+# Environments
+.env
+.venv
+env/
+venv/
+ENV/
+env.bak
+.env.bak
+
+# Databases
+*.db
+*.sqlite3
+
+# Logs
+*.log
+
+# Instance folder
+instance/
+
+# Cache
+__pycache__/
+.pytest_cache/
+.mypy_cache/
+
+# Temporary files
+cookie.txt
