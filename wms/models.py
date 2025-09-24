@@ -2,7 +2,7 @@ from wms import db
 from flask_login import UserMixin
 from werkzeug.security import generate_password_hash, check_password_hash
 import datetime
-from sqlalchemy import Text
+from sqlalchemy import Text, Date
 
 
 class User(UserMixin, db.Model):
@@ -51,3 +51,27 @@ class Shift(db.Model):
 
     def __repr__(self):
         return f"Shift('{self.user.username}', '{self.start_time}' to '{self.end_time}')"
+
+
+class Attendance(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    clock_in_time = db.Column(db.DateTime, nullable=False, default=datetime.datetime.utcnow)
+    clock_out_time = db.Column(db.DateTime, nullable=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    user = db.relationship('User', backref='attendances')
+
+    def __repr__(self):
+        return f"Attendance('{self.user.username}', '{self.clock_in_time}')"
+
+
+class LeaveRequest(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    start_date = db.Column(Date, nullable=False)
+    end_date = db.Column(Date, nullable=False)
+    reason = db.Column(Text, nullable=False)
+    status = db.Column(db.String(20), nullable=False, default='Pending')  # Pending, Approved, Rejected
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    user = db.relationship('User', backref='leave_requests')
+
+    def __repr__(self):
+        return f"LeaveRequest('{self.user.username}', '{self.start_date}' to '{self.end_date}')"

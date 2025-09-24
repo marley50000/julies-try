@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+{% block content %}
+    <div class="content-section">
+        <h1 class="mb-4">All Leave Requests</h1>
+        <div class="table-responsive">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Employee</th>
+                        <th>Start Date</th>
+                        <th>End Date</th>
+                        <th>Reason</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for request in requests %}
+                        <tr>
+                            <td>{{ request.user.username }}</td>
+                            <td>{{ request.start_date.strftime('%Y-%m-%d') }}</td>
+                            <td>{{ request.end_date.strftime('%Y-%m-%d') }}</td>
+                            <td>{{ request.reason }}</td>
+                            <td>
+                                {% if request.status == 'Approved' %}
+                                    <span class="badge bg-success">{{ request.status }}</span>
+                                {% elif request.status == 'Rejected' %}
+                                    <span class="badge bg-danger">{{ request.status }}</span>
+                                {% else %}
+                                    <span class="badge bg-warning">{{ request.status }}</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if request.status == 'Pending' %}
+                                    <form action="{{ url_for('main.approve_leave_request', request_id=request.id) }}" method="POST" class="d-inline">
+                                        <button type="submit" class="btn btn-success btn-sm">Approve</button>
+                                    </form>
+                                    <form action="{{ url_for('main.reject_leave_request', request_id=request.id) }}" method="POST" class="d-inline">
+                                        <button type="submit" class="btn btn-danger btn-sm">Reject</button>
+                                    </form>
+                                {% endif %}
+                            </td>
+                        </tr>
+                    {% else %}
+                        <tr>
+                            <td colspan="6">No leave requests found.</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+{% endblock content %}

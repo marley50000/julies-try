@@ -2,8 +2,8 @@ from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, SubmitField, BooleanField, TextAreaField, SelectField
 from wtforms.validators import DataRequired, Length, Email, EqualTo, ValidationError
 from wtforms_sqlalchemy.fields import QuerySelectField
-from wtforms.fields import DateTimeField
-from wms.models import User, Task, Shift
+from wtforms.fields import DateField, DateTimeField
+from wms.models import User, Task, Shift, LeaveRequest
 
 class RegistrationForm(FlaskForm):
     username = StringField('Username', validators=[DataRequired(), Length(min=2, max=20)])
@@ -50,3 +50,14 @@ class ShiftForm(FlaskForm):
     user = QuerySelectField('Employee', query_factory=user_query, get_label='username', allow_blank=False,
                             validators=[DataRequired()])
     submit = SubmitField('Create Shift')
+
+
+class LeaveRequestForm(FlaskForm):
+    start_date = DateField('Start Date', format='%Y-%m-%d', validators=[DataRequired()])
+    end_date = DateField('End Date', format='%Y-%m-%d', validators=[DataRequired()])
+    reason = TextAreaField('Reason', validators=[DataRequired()])
+    submit = SubmitField('Submit Request')
+
+
+class EmptyForm(FlaskForm):
+    pass
