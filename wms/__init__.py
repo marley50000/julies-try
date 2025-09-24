@@ -15,6 +15,7 @@ def create_app():
     app.config['SECRET_KEY'] = 'a-very-secret-key'
     app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///wms.db'
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+    app.config['UPLOAD_FOLDER'] = os.path.join(app.root_path, 'static/uploads')
 
     db.init_app(app)
     login_manager.init_app(app)

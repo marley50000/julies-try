@@ -87,3 +87,15 @@ class Salary(db.Model):
 
     def __repr__(self):
         return f"Salary('{self.user.username}', '{self.basic_pay}')"
+
+
+class Document(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    filename = db.Column(db.String(100), nullable=False)
+    upload_date = db.Column(db.DateTime, nullable=False, default=datetime.datetime.utcnow)
+    expiry_date = db.Column(db.Date, nullable=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    user = db.relationship('User', backref='documents')
+
+    def __repr__(self):
+        return f"Document('{self.filename}', '{self.user.username}')"

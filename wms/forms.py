@@ -4,7 +4,9 @@ from wtforms.validators import DataRequired, Length, Email, EqualTo, ValidationE
 from wtforms_sqlalchemy.fields import QuerySelectField
 from wtforms import FloatField
 from wtforms.fields import DateField, DateTimeField
-from wms.models import User, Task, Shift, LeaveRequest, Salary
+from wtforms.validators import Optional
+from flask_wtf.file import FileField, FileAllowed
+from wms.models import User, Task, Shift, LeaveRequest, Salary, Document
 
 class RegistrationForm(FlaskForm):
     username = StringField('Username', validators=[DataRequired(), Length(min=2, max=20)])
@@ -69,3 +71,11 @@ class SalaryForm(FlaskForm):
     allowances = FloatField('Allowances', validators=[DataRequired()])
     deductions = FloatField('Deductions', validators=[DataRequired()])
     submit = SubmitField('Update Salary')
+
+
+class DocumentForm(FlaskForm):
+    file = FileField('Document', validators=[DataRequired(), FileAllowed(['pdf', 'doc', 'docx', 'jpg', 'png'])])
+    user = QuerySelectField('Employee', query_factory=user_query, get_label='username', allow_blank=False,
+                            validators=[DataRequired()])
+    expiry_date = DateField('Expiry Date (Optional)', format='%Y-%m-%d', validators=[Optional()])
+    submit = SubmitField('Upload Document')

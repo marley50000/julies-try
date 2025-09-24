@@ -3,10 +3,12 @@ from flask_login import login_user, current_user, logout_user, login_required
 from wms import db
 import datetime
 
-from wms.models import User, Task, Shift, Attendance, LeaveRequest, Salary
-from wms.forms import RegistrationForm, LoginForm, TaskForm, ShiftForm, LeaveRequestForm, EmptyForm, SalaryForm
+from wms.models import User, Task, Shift, Attendance, LeaveRequest, Salary, Document
+from wms.forms import RegistrationForm, LoginForm, TaskForm, ShiftForm, LeaveRequestForm, EmptyForm, SalaryForm, DocumentForm
 from .decorators import roles_required
 from .payroll import calculate_overtime
+from werkzeug.utils import secure_filename
+from flask import current_app
 
 main_bp = Blueprint('main', __name__)
 
@@ -223,3 +225,35 @@ def generate_payslip(user_id):
     }
 
     return render_template('payslip.html', title='Payslip', **payslip_data)
+
+
+@main_bp.route("/document/upload", methods=['GET', 'POST'])
+@login_required
+@roles_required('Admin', 'Manager')
+def upload_document():
+    form = DocumentForm()
+    if form.validate_on_submit():
+        file = form.file.data
+        filename = secure_filename(file.filename)
+        file.save(os.path.join(current_app.config['UPLOAD_FOLDER'], filename))
+
+        document = Document(filename=filename,
+                              user=form.user.data,
+                              expiry_date=form.expiry_date.data)
+        db.session.add(document)
+        db.session.commit()
+        flash('The document has been uploaded.', 'success')
+        return redirect(url_for('main.home')) # Redirect to a document list page later
+    return render_template('upload_document.html', title='Upload Document', form=form)
+
+
+@main_bp.route("/documents")
+@login_required
+@roles_required('Admin', 'Manager')
+def documents():
+    query = request.args.get('q')
+    if query:
+        docs = Document.query.filter(Document.filename.contains(query)).all()
+    else:
+        docs = Document.query.all()
+    return render_template('documents.html', title='Document Management', documents=docs, today=datetime.date.today())
