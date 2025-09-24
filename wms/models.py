@@ -99,3 +99,30 @@ class Document(db.Model):
 
     def __repr__(self):
         return f"Document('{self.filename}', '{self.user.username}')"
+
+
+class Goal(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    title = db.Column(db.String(100), nullable=False)
+    description = db.Column(Text, nullable=False)
+    status = db.Column(db.String(20), nullable=False, default='In Progress')  # In Progress, Completed, Archived
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    user = db.relationship('User', backref='goals')
+
+    def __repr__(self):
+        return f"Goal('{self.title}', '{self.user.username}')"
+
+
+class Evaluation(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    content = db.Column(Text, nullable=False)
+    rating = db.Column(db.Integer, nullable=False)  # e.g., 1-5
+    date_created = db.Column(db.DateTime, nullable=False, default=datetime.datetime.utcnow)
+    author_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    employee_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+
+    author = db.relationship('User', foreign_keys=[author_id], backref='evaluations_written')
+    employee = db.relationship('User', foreign_keys=[employee_id], backref='evaluations_received')
+
+    def __repr__(self):
+        return f"Evaluation for '{self.employee.username}' by '{self.author.username}'"

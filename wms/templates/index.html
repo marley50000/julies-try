@@ -27,7 +27,7 @@
     <div class="row">
         <div class="col-md-8">
             <h2>My Assigned Tasks</h2>
-            <div class="list-group">
+            <div class="list-group mb-4">
                 {% for task in tasks %}
                     <a href="#" class="list-group-item list-group-item-action">
                         <div class="d-flex w-100 justify-content-between">
@@ -40,6 +40,24 @@
                 {% else %}
                     <div class="list-group-item">
                         You have no tasks assigned to you.
+                    </div>
+                {% endfor %}
+            </div>
+
+            <h2>My Goals</h2>
+            <a class="btn btn-info btn-sm mb-2" href="{{ url_for('main.new_goal') }}">Set New Goal</a>
+            <div class="list-group">
+                {% for goal in goals %}
+                    <a href="{{ url_for('main.edit_goal', goal_id=goal.id) }}" class="list-group-item list-group-item-action">
+                        <div class="d-flex w-100 justify-content-between">
+                            <h5 class="mb-1">{{ goal.title }}</h5>
+                            <small>Status: {{ goal.status }}</small>
+                        </div>
+                        <p class="mb-1">{{ goal.description }}</p>
+                    </a>
+                {% else %}
+                    <div class="list-group-item">
+                        You have no active goals.
                     </div>
                 {% endfor %}
             </div>

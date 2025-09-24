@@ -3,8 +3,8 @@ from flask_login import login_user, current_user, logout_user, login_required
 from wms import db
 import datetime
 
-from wms.models import User, Task, Shift, Attendance, LeaveRequest, Salary, Document
-from wms.forms import RegistrationForm, LoginForm, TaskForm, ShiftForm, LeaveRequestForm, EmptyForm, SalaryForm, DocumentForm
+from wms.models import User, Task, Shift, Attendance, LeaveRequest, Salary, Document, Goal, Evaluation
+from wms.forms import RegistrationForm, LoginForm, TaskForm, ShiftForm, LeaveRequestForm, EmptyForm, SalaryForm, DocumentForm, GoalForm, EvaluationForm
 from .decorators import roles_required
 from .payroll import calculate_overtime
 from werkzeug.utils import secure_filename
@@ -21,8 +21,9 @@ def home():
     last_attendance = Attendance.query.filter_by(user_id=current_user.id).order_by(Attendance.clock_in_time.desc()).first()
     attendance_history = Attendance.query.filter_by(user_id=current_user.id).order_by(Attendance.clock_in_time.desc()).limit(7).all()
     leave_requests = current_user.leave_requests
+    goals = Goal.query.filter_by(user=current_user).filter(Goal.status != 'Archived').all()
     clock_form = EmptyForm()
-    return render_template('index.html', title='Home', tasks=tasks, shifts=shifts, last_attendance=last_attendance, attendance_history=attendance_history, leave_requests=leave_requests, clock_form=clock_form)
+    return render_template('index.html', title='Home', tasks=tasks, shifts=shifts, last_attendance=last_attendance, attendance_history=attendance_history, leave_requests=leave_requests, goals=goals, clock_form=clock_form)
 
 @main_bp.route("/register", methods=['GET', 'POST'])
 def register():
@@ -257,3 +258,67 @@ def documents():
     else:
         docs = Document.query.all()
     return render_template('documents.html', title='Document Management', documents=docs, today=datetime.date.today())
+
+
+@main_bp.route("/goal/new", methods=['GET', 'POST'])
+@login_required
+def new_goal():
+    form = GoalForm()
+    if form.validate_on_submit():
+        goal = Goal(title=form.title.data,
+                    description=form.description.data,
+                    status=form.status.data,
+                    user=current_user)
+        db.session.add(goal)
+        db.session.commit()
+        flash('Your goal has been created.', 'success')
+        return redirect(url_for('main.home'))
+    return render_template('create_goal.html', title='New Goal', form=form)
+
+
+@main_bp.route("/goal/<int:goal_id>/edit", methods=['GET', 'POST'])
+@login_required
+def edit_goal(goal_id):
+    goal = Goal.query.get_or_404(goal_id)
+    if goal.user != current_user and current_user.role not in ['Admin', 'Manager']:
+        abort(403)
+
+    form = GoalForm(obj=goal)
+    if form.validate_on_submit():
+        goal.title = form.title.data
+        goal.description = form.description.data
+        goal.status = form.status.data
+        db.session.commit()
+        flash('Your goal has been updated.', 'success')
+        return redirect(url_for('main.home'))
+
+    return render_template('create_goal.html', title='Edit Goal', form=form)
+
+
+@main_bp.route("/evaluation/new/<int:employee_id>", methods=['GET', 'POST'])
+@login_required
+@roles_required('Admin', 'Manager')
+def new_evaluation(employee_id):
+    employee = User.query.get_or_404(employee_id)
+    form = EvaluationForm()
+    if form.validate_on_submit():
+        evaluation = Evaluation(content=form.content.data,
+                                rating=form.rating.data,
+                                author=current_user,
+                                employee=employee)
+        db.session.add(evaluation)
+        db.session.commit()
+        flash(f"Evaluation for {employee.username} has been submitted.", 'success')
+        return redirect(url_for('main.home'))
+    return render_template('create_evaluation.html', title='New Evaluation', form=form, employee=employee)
+
+
+@main_bp.route("/evaluations/<int:user_id>")
+@login_required
+def view_evaluations(user_id):
+    user = User.query.get_or_404(user_id)
+    if user != current_user and current_user.role not in ['Admin', 'Manager']:
+        abort(403)
+
+    evaluations = user.evaluations_received
+    return render_template('view_evaluations.html', title='View Evaluations', user=user, evaluations=evaluations)

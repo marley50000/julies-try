@@ -23,6 +23,7 @@
                             <td>
                                 <a href="{{ url_for('main.edit_salary', user_id=user.id) }}" class="btn btn-secondary btn-sm">Edit Salary</a>
                                 <a href="{{ url_for('main.generate_payslip', user_id=user.id) }}" class="btn btn-info btn-sm">Generate Payslip</a>
+                                <a href="{{ url_for('main.new_evaluation', employee_id=user.id) }}" class="btn btn-warning btn-sm">Write Evaluation</a>
                             </td>
                         </tr>
                     {% else %}

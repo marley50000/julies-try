@@ -4,9 +4,9 @@ from wtforms.validators import DataRequired, Length, Email, EqualTo, ValidationE
 from wtforms_sqlalchemy.fields import QuerySelectField
 from wtforms import FloatField
 from wtforms.fields import DateField, DateTimeField
-from wtforms.validators import Optional
+from wtforms.validators import Optional, NumberRange
 from flask_wtf.file import FileField, FileAllowed
-from wms.models import User, Task, Shift, LeaveRequest, Salary, Document
+from wms.models import User, Task, Shift, LeaveRequest, Salary, Document, Goal, Evaluation
 
 class RegistrationForm(FlaskForm):
     username = StringField('Username', validators=[DataRequired(), Length(min=2, max=20)])
@@ -79,3 +79,18 @@ class DocumentForm(FlaskForm):
                             validators=[DataRequired()])
     expiry_date = DateField('Expiry Date (Optional)', format='%Y-%m-%d', validators=[Optional()])
     submit = SubmitField('Upload Document')
+
+
+class GoalForm(FlaskForm):
+    title = StringField('Title', validators=[DataRequired()])
+    description = TextAreaField('Description', validators=[DataRequired()])
+    status = SelectField('Status', choices=[('In Progress', 'In Progress'), ('Completed', 'Completed'), ('Archived', 'Archived')],
+                         validators=[DataRequired()])
+    submit = SubmitField('Save Goal')
+
+
+class EvaluationForm(FlaskForm):
+    content = TextAreaField('Evaluation Content', validators=[DataRequired()])
+    rating = SelectField('Rating', choices=[(1, '1'), (2, '2'), (3, '3'), (4, '4'), (5, '5')], coerce=int,
+                         validators=[DataRequired(), NumberRange(min=1, max=5)])
+    submit = SubmitField('Submit Evaluation')
