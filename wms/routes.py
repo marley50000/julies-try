@@ -3,9 +3,10 @@ from flask_login import login_user, current_user, logout_user, login_required
 from wms import db
 import datetime
 
-from wms.models import User, Task, Shift, Attendance, LeaveRequest
-from wms.forms import RegistrationForm, LoginForm, TaskForm, ShiftForm, LeaveRequestForm, EmptyForm
+from wms.models import User, Task, Shift, Attendance, LeaveRequest, Salary
+from wms.forms import RegistrationForm, LoginForm, TaskForm, ShiftForm, LeaveRequestForm, EmptyForm, SalaryForm
 from .decorators import roles_required
+from .payroll import calculate_overtime
 
 main_bp = Blueprint('main', __name__)
 
@@ -154,3 +155,71 @@ def reject_leave_request(request_id):
     db.session.commit()
     flash('The leave request has been rejected.', 'danger')
     return redirect(url_for('main.leave_requests'))
+
+
+@main_bp.route("/payroll")
+@login_required
+@roles_required('Admin', 'Manager')
+def payroll():
+    users = User.query.all()
+    return render_template('payroll.html', title='Payroll Management', users=users)
+
+
+@main_bp.route("/payroll/edit/<int:user_id>", methods=['GET', 'POST'])
+@login_required
+@roles_required('Admin', 'Manager')
+def edit_salary(user_id):
+    user = User.query.get_or_404(user_id)
+    salary = user.salary or Salary(user=user)
+    form = SalaryForm(obj=salary)
+
+    if form.validate_on_submit():
+        salary.basic_pay = form.basic_pay.data
+        salary.allowances = form.allowances.data
+        salary.deductions = form.deductions.data
+        db.session.add(salary)
+        db.session.commit()
+        flash(f"{user.username}'s salary has been updated.", 'success')
+        return redirect(url_for('main.payroll'))
+
+    return render_template('edit_salary.html', title='Edit Salary', form=form, user=user)
+
+
+@main_bp.route("/payroll/payslip/<int:user_id>")
+@login_required
+@roles_required('Admin', 'Manager')
+def generate_payslip(user_id):
+    user = User.query.get_or_404(user_id)
+    salary = user.salary
+    if not salary:
+        flash(f"{user.username} does not have salary information.", 'danger')
+        return redirect(url_for('main.payroll'))
+
+    # For simplicity, calculate overtime for the current month
+    today = datetime.date.today()
+    start_of_month = today.replace(day=1)
+
+    attendance_records = Attendance.query.filter(
+        Attendance.user_id == user_id,
+        Attendance.clock_in_time >= start_of_month
+    ).all()
+
+    overtime_hours = calculate_overtime(attendance_records)
+    # Assuming an arbitrary overtime rate for now
+    overtime_rate = (salary.basic_pay / 160) * 1.5  # Example: 160 hours in a month
+    overtime_pay = overtime_hours * overtime_rate
+
+    total_earnings = salary.basic_pay + salary.allowances + overtime_pay
+    net_pay = total_earnings - salary.deductions
+
+    payslip_data = {
+        'user': user,
+        'salary': salary,
+        'overtime_hours': overtime_hours,
+        'overtime_pay': overtime_pay,
+        'total_earnings': total_earnings,
+        'net_pay': net_pay,
+        'pay_period': start_of_month.strftime('%B %Y')
+    }
+
+    return render_template('payslip.html', title='Payslip', **payslip_data)

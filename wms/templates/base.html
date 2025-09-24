@@ -17,6 +17,7 @@
                         <li class="nav-item"><a class="nav-link" href="{{ url_for('main.new_leave_request') }}">Request Leave</a></li>
                         {% if current_user.role in ['Admin', 'Manager'] %}
                             <li class="nav-item"><a class="nav-link" href="{{ url_for('main.leave_requests') }}">Manage Leave</a></li>
+                            <li class="nav-item"><a class="nav-link" href="{{ url_for('main.payroll') }}">Payroll</a></li>
                         {% endif %}
                     {% endif %}
                 </ul>

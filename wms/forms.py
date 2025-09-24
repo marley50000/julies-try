@@ -2,8 +2,9 @@ from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, SubmitField, BooleanField, TextAreaField, SelectField
 from wtforms.validators import DataRequired, Length, Email, EqualTo, ValidationError
 from wtforms_sqlalchemy.fields import QuerySelectField
+from wtforms import FloatField
 from wtforms.fields import DateField, DateTimeField
-from wms.models import User, Task, Shift, LeaveRequest
+from wms.models import User, Task, Shift, LeaveRequest, Salary
 
 class RegistrationForm(FlaskForm):
     username = StringField('Username', validators=[DataRequired(), Length(min=2, max=20)])
@@ -61,3 +62,10 @@ class LeaveRequestForm(FlaskForm):
 
 class EmptyForm(FlaskForm):
     pass
+
+
+class SalaryForm(FlaskForm):
+    basic_pay = FloatField('Basic Pay', validators=[DataRequired()])
+    allowances = FloatField('Allowances', validators=[DataRequired()])
+    deductions = FloatField('Deductions', validators=[DataRequired()])
+    submit = SubmitField('Update Salary')
