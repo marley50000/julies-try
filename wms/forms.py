@@ -1,11 +1,13 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, SubmitField, BooleanField, SelectField
-from wtforms.validators import DataRequired, Length, Email, EqualTo, ValidationError
+from wtforms import StringField, PasswordField, SubmitField, BooleanField, TextAreaField, SelectField, FloatField
+from wtforms.validators import DataRequired, Length, Email, EqualTo, ValidationError, Optional, NumberRange
 from wtforms_sqlalchemy.fields import QuerySelectField
-from wtforms.fields import DateField
-from wtforms.validators import Optional
+from wtforms.fields import DateField, DateTimeField
 from flask_wtf.file import FileField, FileAllowed
-from wms.models import User, Document
+from wms.models import User
+
+def user_query():
+    return User.query
 
 class RegistrationForm(FlaskForm):
     username = StringField('Username', validators=[DataRequired(), Length(min=2, max=20)])
@@ -30,10 +32,37 @@ class LoginForm(FlaskForm):
     remember = BooleanField('Remember Me')
     submit = SubmitField('Login')
 
+class TaskForm(FlaskForm):
+    title = StringField('Title', validators=[DataRequired()])
+    description = TextAreaField('Description', validators=[DataRequired()])
+    priority = SelectField('Priority', choices=[('Low', 'Low'), ('Medium', 'Medium'), ('High', 'High')],
+                           validators=[DataRequired()])
+    deadline = DateTimeField('Deadline', format='%Y-%m-%d %H:%M:%S', validators=[DataRequired()])
+    assigned_to = QuerySelectField('Assign To', query_factory=user_query, get_label='username', allow_blank=False,
+                                   validators=[DataRequired()])
+    submit = SubmitField('Create Task')
 
-def user_query():
-    return User.query
+class ShiftForm(FlaskForm):
+    start_time = DateTimeField('Start Time', format='%Y-%m-%d %H:%M:%S', validators=[DataRequired()])
+    end_time = DateTimeField('End Time', format='%Y-%m-%d %H:%M:%S', validators=[DataRequired()])
+    user = QuerySelectField('Employee', query_factory=user_query, get_label='username', allow_blank=False,
+                            validators=[DataRequired()])
+    submit = SubmitField('Create Shift')
 
+class LeaveRequestForm(FlaskForm):
+    start_date = DateField('Start Date', format='%Y-%m-%d', validators=[DataRequired()])
+    end_date = DateField('End Date', format='%Y-%m-%d', validators=[DataRequired()])
+    reason = TextAreaField('Reason', validators=[DataRequired()])
+    submit = SubmitField('Submit Request')
+
+class EmptyForm(FlaskForm):
+    pass
+
+class SalaryForm(FlaskForm):
+    basic_pay = FloatField('Basic Pay', validators=[DataRequired()])
+    allowances = FloatField('Allowances', validators=[DataRequired()])
+    deductions = FloatField('Deductions', validators=[DataRequired()])
+    submit = SubmitField('Update Salary')
 
 class DocumentForm(FlaskForm):
     file = FileField('Document', validators=[DataRequired(), FileAllowed(['pdf', 'doc', 'docx', 'jpg', 'png'])])
@@ -43,3 +72,25 @@ class DocumentForm(FlaskForm):
                            validators=[DataRequired()])
     expiry_date = DateField('Expiry Date (Optional)', format='%Y-%m-%d', validators=[Optional()])
     submit = SubmitField('Upload Document')
+
+class GoalForm(FlaskForm):
+    title = StringField('Title', validators=[DataRequired()])
+    description = TextAreaField('Description', validators=[DataRequired()])
+    status = SelectField('Status', choices=[('In Progress', 'In Progress'), ('Completed', 'Completed'), ('Archived', 'Archived')],
+                         validators=[DataRequired()])
+    submit = SubmitField('Save Goal')
+
+class EvaluationForm(FlaskForm):
+    content = TextAreaField('Evaluation Content', validators=[DataRequired()])
+    rating = SelectField('Rating', choices=[(1, '1'), (2, '2'), (3, '3'), (4, '4'), (5, '5')], coerce=int,
+                         validators=[DataRequired(), NumberRange(min=1, max=5)])
+    submit = SubmitField('Submit Evaluation')
+
+class AnnouncementForm(FlaskForm):
+    title = StringField('Title', validators=[DataRequired()])
+    content = TextAreaField('Content', validators=[DataRequired()])
+    submit = SubmitField('Post Announcement')
+
+class MessageForm(FlaskForm):
+    content = TextAreaField('Message', validators=[DataRequired()])
+    submit = SubmitField('Send')
