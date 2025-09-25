@@ -58,12 +58,6 @@ class LeaveRequestForm(FlaskForm):
 class EmptyForm(FlaskForm):
     pass
 
-class SalaryForm(FlaskForm):
-    basic_pay = FloatField('Basic Pay', validators=[DataRequired()])
-    allowances = FloatField('Allowances', validators=[DataRequired()])
-    deductions = FloatField('Deductions', validators=[DataRequired()])
-    submit = SubmitField('Update Salary')
-
 class DocumentForm(FlaskForm):
     file = FileField('Document', validators=[DataRequired(), FileAllowed(['pdf', 'doc', 'docx', 'jpg', 'png'])])
     user = QuerySelectField('Employee', query_factory=user_query, get_label='username', allow_blank=False,

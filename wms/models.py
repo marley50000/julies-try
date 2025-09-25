@@ -77,18 +77,6 @@ class LeaveRequest(db.Model):
         return f"LeaveRequest('{self.user.username}', '{self.start_date}' to '{self.end_date}')"
 
 
-class Salary(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    basic_pay = db.Column(db.Float, nullable=False, default=0.0)
-    allowances = db.Column(db.Float, nullable=False, default=0.0)
-    deductions = db.Column(db.Float, nullable=False, default=0.0)
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
-    user = db.relationship('User', backref=db.backref('salary', uselist=False))
-
-    def __repr__(self):
-        return f"Salary('{self.user.username}', '{self.basic_pay}')"
-
-
 class Document(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     filename = db.Column(db.String(100), nullable=False)
