@@ -17,6 +17,17 @@
                     {% endif %}
                 </div>
                 <div class="form-group">
+                    {{ form.category.label(class="form-control-label") }}
+                    {{ form.category(class="form-control form-control-lg") }}
+                    {% if form.category.errors %}
+                        <div class="invalid-feedback">
+                            {% for error in form.category.errors %}
+                                <span>{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+                <div class="form-group">
                     {{ form.user.label(class="form-control-label") }}
                     {{ form.user(class="form-control form-control-lg") }}
                     {% if form.user.errors %}

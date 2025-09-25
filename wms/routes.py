@@ -4,13 +4,11 @@ from wms import db
 import datetime
 import os
 
-from wms.models import User, Task, Shift, Attendance, LeaveRequest, Salary, Document, Goal, Evaluation, Announcement, Message
-from wms.forms import RegistrationForm, LoginForm, TaskForm, ShiftForm, LeaveRequestForm, EmptyForm, SalaryForm, DocumentForm, GoalForm, EvaluationForm, AnnouncementForm, MessageForm
+from wms.models import User, Document
+from wms.forms import RegistrationForm, LoginForm, DocumentForm
 from .decorators import roles_required
-from .payroll import calculate_overtime
 from werkzeug.utils import secure_filename
 from flask import current_app
-from sqlalchemy import or_
 
 main_bp = Blueprint('main', __name__)
 
@@ -18,14 +16,7 @@ main_bp = Blueprint('main', __name__)
 @main_bp.route("/home")
 @login_required
 def home():
-    tasks = current_user.tasks_assigned_to
-    shifts = current_user.shifts
-    last_attendance = Attendance.query.filter_by(user_id=current_user.id).order_by(Attendance.clock_in_time.desc()).first()
-    attendance_history = Attendance.query.filter_by(user_id=current_user.id).order_by(Attendance.clock_in_time.desc()).limit(7).all()
-    leave_requests = current_user.leave_requests
-    goals = Goal.query.filter_by(user=current_user).filter(Goal.status != 'Archived').all()
-    clock_form = EmptyForm()
-    return render_template('index.html', title='Home', tasks=tasks, shifts=shifts, last_attendance=last_attendance, attendance_history=attendance_history, leave_requests=leave_requests, goals=goals, clock_form=clock_form)
+    return render_template('home.html', title='Home')
 
 @main_bp.route("/register", methods=['GET', 'POST'])
 def register():
@@ -62,174 +53,6 @@ def logout():
     return redirect(url_for('main.login'))
 
 
-@main_bp.route("/task/new", methods=['GET', 'POST'])
-@login_required
-@roles_required('Admin', 'Manager')
-def new_task():
-    form = TaskForm()
-    if form.validate_on_submit():
-        task = Task(title=form.title.data,
-                    description=form.description.data,
-                    priority=form.priority.data,
-                    deadline=form.deadline.data,
-                    assigned_to=form.assigned_to.data,
-                    assigned_by=current_user)
-        db.session.add(task)
-        db.session.commit()
-        flash('The task has been created!', 'success')
-        return redirect(url_for('main.home'))
-    return render_template('create_task.html', title='New Task', form=form, legend='New Task')
-
-
-@main_bp.route("/shift/new", methods=['GET', 'POST'])
-@login_required
-@roles_required('Admin', 'Manager')
-def new_shift():
-    form = ShiftForm()
-    if form.validate_on_submit():
-        shift = Shift(start_time=form.start_time.data,
-                      end_time=form.end_time.data,
-                      user=form.user.data)
-        db.session.add(shift)
-        db.session.commit()
-        flash('The shift has been created!', 'success')
-        return redirect(url_for('main.home'))
-    return render_template('create_shift.html', title='New Shift', form=form, legend='New Shift')
-
-
-@main_bp.route("/attendance/clock", methods=['POST'])
-@login_required
-def clock_in_out():
-    last_attendance = Attendance.query.filter_by(user_id=current_user.id).order_by(Attendance.clock_in_time.desc()).first()
-
-    if last_attendance and last_attendance.clock_out_time is None:
-        # Clock out
-        last_attendance.clock_out_time = datetime.datetime.utcnow()
-        flash('You have been clocked out.', 'success')
-    else:
-        # Clock in
-        new_attendance = Attendance(user_id=current_user.id)
-        db.session.add(new_attendance)
-        flash('You have been clocked in.', 'success')
-
-    db.session.commit()
-    return redirect(url_for('main.home'))
-
-
-@main_bp.route("/leave/new", methods=['GET', 'POST'])
-@login_required
-def new_leave_request():
-    form = LeaveRequestForm()
-    if form.validate_on_submit():
-        leave_request = LeaveRequest(start_date=form.start_date.data,
-                                     end_date=form.end_date.data,
-                                     reason=form.reason.data,
-                                     user=current_user)
-        db.session.add(leave_request)
-        db.session.commit()
-        flash('Your leave request has been submitted.', 'success')
-        return redirect(url_for('main.home'))
-    return render_template('create_leave_request.html', title='New Leave Request', form=form, legend='New Leave Request')
-
-
-@main_bp.route("/leave/requests")
-@login_required
-@roles_required('Admin', 'Manager')
-def leave_requests():
-    requests = LeaveRequest.query.order_by(LeaveRequest.start_date.asc()).all()
-    return render_template('leave_requests.html', title='Leave Requests', requests=requests)
-
-
-@main_bp.route("/leave/requests/<int:request_id>/approve", methods=['POST'])
-@login_required
-@roles_required('Admin', 'Manager')
-def approve_leave_request(request_id):
-    leave_request = LeaveRequest.query.get_or_404(request_id)
-    leave_request.status = 'Approved'
-    db.session.commit()
-    flash('The leave request has been approved.', 'success')
-    return redirect(url_for('main.leave_requests'))
-
-
-@main_bp.route("/leave/requests/<int:request_id>/reject", methods=['POST'])
-@login_required
-@roles_required('Admin', 'Manager')
-def reject_leave_request(request_id):
-    leave_request = LeaveRequest.query.get_or_404(request_id)
-    leave_request.status = 'Rejected'
-    db.session.commit()
-    flash('The leave request has been rejected.', 'danger')
-    return redirect(url_for('main.leave_requests'))
-
-
-@main_bp.route("/payroll")
-@login_required
-@roles_required('Admin', 'Manager')
-def payroll():
-    users = User.query.all()
-    return render_template('payroll.html', title='Payroll Management', users=users)
-
-
-@main_bp.route("/payroll/edit/<int:user_id>", methods=['GET', 'POST'])
-@login_required
-@roles_required('Admin', 'Manager')
-def edit_salary(user_id):
-    user = User.query.get_or_404(user_id)
-    salary = user.salary or Salary(user=user)
-    form = SalaryForm(obj=salary)
-
-    if form.validate_on_submit():
-        salary.basic_pay = form.basic_pay.data
-        salary.allowances = form.allowances.data
-        salary.deductions = form.deductions.data
-        db.session.add(salary)
-        db.session.commit()
-        flash(f"{user.username}'s salary has been updated.", 'success')
-        return redirect(url_for('main.payroll'))
-
-    return render_template('edit_salary.html', title='Edit Salary', form=form, user=user)
-
-
-@main_bp.route("/payroll/payslip/<int:user_id>")
-@login_required
-@roles_required('Admin', 'Manager')
-def generate_payslip(user_id):
-    user = User.query.get_or_404(user_id)
-    salary = user.salary
-    if not salary:
-        flash(f"{user.username} does not have salary information.", 'danger')
-        return redirect(url_for('main.payroll'))
-
-    # For simplicity, calculate overtime for the current month
-    today = datetime.date.today()
-    start_of_month = today.replace(day=1)
-
-    attendance_records = Attendance.query.filter(
-        Attendance.user_id == user_id,
-        Attendance.clock_in_time >= start_of_month
-    ).all()
-
-    overtime_hours = calculate_overtime(attendance_records)
-    # Assuming an arbitrary overtime rate for now
-    overtime_rate = (salary.basic_pay / 160) * 1.5  # Example: 160 hours in a month
-    overtime_pay = overtime_hours * overtime_rate
-
-    total_earnings = salary.basic_pay + salary.allowances + overtime_pay
-    net_pay = total_earnings - salary.deductions
-
-    payslip_data = {
-        'user': user,
-        'salary': salary,
-        'overtime_hours': overtime_hours,
-        'overtime_pay': overtime_pay,
-        'total_earnings': total_earnings,
-        'net_pay': net_pay,
-        'pay_period': start_of_month.strftime('%B %Y')
-    }
-
-    return render_template('payslip.html', title='Payslip', **payslip_data)
-
-
 @main_bp.route("/document/upload", methods=['GET', 'POST'])
 @login_required
 @roles_required('Admin', 'Manager')
@@ -242,11 +65,12 @@ def upload_document():
 
         document = Document(filename=filename,
                               user=form.user.data,
+                              category=form.category.data,
                               expiry_date=form.expiry_date.data)
         db.session.add(document)
         db.session.commit()
         flash('The document has been uploaded.', 'success')
-        return redirect(url_for('main.home')) # Redirect to a document list page later
+        return redirect(url_for('main.documents'))
     return render_template('upload_document.html', title='Upload Document', form=form)
 
 
@@ -262,125 +86,8 @@ def documents():
     return render_template('documents.html', title='Document Management', documents=docs, today=datetime.date.today())
 
 
-@main_bp.route("/goal/new", methods=['GET', 'POST'])
+@main_bp.route("/my_payslips")
 @login_required
-def new_goal():
-    form = GoalForm()
-    if form.validate_on_submit():
-        goal = Goal(title=form.title.data,
-                    description=form.description.data,
-                    status=form.status.data,
-                    user=current_user)
-        db.session.add(goal)
-        db.session.commit()
-        flash('Your goal has been created.', 'success')
-        return redirect(url_for('main.home'))
-    return render_template('create_goal.html', title='New Goal', form=form)
-
-
-@main_bp.route("/goal/<int:goal_id>/edit", methods=['GET', 'POST'])
-@login_required
-def edit_goal(goal_id):
-    goal = Goal.query.get_or_404(goal_id)
-    if goal.user != current_user and current_user.role not in ['Admin', 'Manager']:
-        abort(403)
-
-    form = GoalForm(obj=goal)
-    if form.validate_on_submit():
-        goal.title = form.title.data
-        goal.description = form.description.data
-        goal.status = form.status.data
-        db.session.commit()
-        flash('Your goal has been updated.', 'success')
-        return redirect(url_for('main.home'))
-
-    return render_template('create_goal.html', title='Edit Goal', form=form)
-
-
-@main_bp.route("/evaluation/new/<int:employee_id>", methods=['GET', 'POST'])
-@login_required
-@roles_required('Admin', 'Manager')
-def new_evaluation(employee_id):
-    employee = User.query.get_or_404(employee_id)
-    form = EvaluationForm()
-    if form.validate_on_submit():
-        evaluation = Evaluation(content=form.content.data,
-                                rating=form.rating.data,
-                                author=current_user,
-                                employee=employee)
-        db.session.add(evaluation)
-        db.session.commit()
-        flash(f"Evaluation for {employee.username} has been submitted.", 'success')
-        return redirect(url_for('main.home'))
-    return render_template('create_evaluation.html', title='New Evaluation', form=form, employee=employee)
-
-
-@main_bp.route("/evaluations/<int:user_id>")
-@login_required
-def view_evaluations(user_id):
-    user = User.query.get_or_404(user_id)
-    if user != current_user and current_user.role not in ['Admin', 'Manager']:
-        abort(403)
-
-    evaluations = user.evaluations_received
-    return render_template('view_evaluations.html', title='View Evaluations', user=user, evaluations=evaluations)
-
-
-@main_bp.route("/announcements")
-@login_required
-def announcements():
-    all_announcements = Announcement.query.order_by(Announcement.date_posted.desc()).all()
-    return render_template('announcements.html', title='Announcements', announcements=all_announcements)
-
-
-@main_bp.route("/announcement/new", methods=['GET', 'POST'])
-@login_required
-@roles_required('Admin', 'Manager')
-def new_announcement():
-    form = AnnouncementForm()
-    if form.validate_on_submit():
-        announcement = Announcement(title=form.title.data,
-                                    content=form.content.data,
-                                    user=current_user)
-        db.session.add(announcement)
-        db.session.commit()
-        flash('Your announcement has been posted.', 'success')
-        return redirect(url_for('main.announcements'))
-    return render_template('create_announcement.html', title='New Announcement', form=form)
-
-
-@main_bp.route("/messages")
-@login_required
-def messages():
-    # Get all users the current user has had a conversation with
-    sent_to = db.session.query(Message.recipient_id).filter(Message.sender_id == current_user.id)
-    received_from = db.session.query(Message.sender_id).filter(Message.recipient_id == current_user.id)
-    user_ids_with_conversations = list(set([item[0] for item in sent_to.union(received_from)]))
-
-    conversations = User.query.filter(User.id.in_(user_ids_with_conversations)).all()
-    all_users = User.query.filter(User.id != current_user.id).all()
-
-    return render_template('messages.html', title='Messages', conversations=conversations, all_users=all_users)
-
-
-@main_bp.route("/messages/<int:recipient_id>", methods=['GET', 'POST'])
-@login_required
-def conversation(recipient_id):
-    recipient = User.query.get_or_404(recipient_id)
-    form = MessageForm()
-    if form.validate_on_submit():
-        msg = Message(content=form.content.data,
-                      sender=current_user,
-                      recipient=recipient)
-        db.session.add(msg)
-        db.session.commit()
-        return redirect(url_for('main.conversation', recipient_id=recipient_id))
-
-    messages = Message.query.filter(
-        or_(
-            (Message.sender_id == current_user.id) & (Message.recipient_id == recipient_id),
-            (Message.sender_id == recipient_id) & (Message.recipient_id == current_user.id)
-        )
-    ).order_by(Message.timestamp.asc()).all()
-
-    return render_template('conversation.html', title=f"Conversation with {recipient.username}", form=form, recipient=recipient, messages=messages)
+def my_payslips():
+    payslips = Document.query.filter_by(user=current_user, category='Payslip').order_by(Document.upload_date.desc()).all()
+    return render_template('my_payslips.html', title='My Payslips', payslips=payslips)

@@ -10,12 +10,10 @@ env.bak
 # Databases
 *.db
 *.sqlite3
+instance/
 
 # Logs
 *.log
-
-# Instance folder
-instance/
 
 # Cache
 __pycache__/
