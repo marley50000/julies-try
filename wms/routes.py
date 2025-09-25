@@ -4,10 +4,9 @@ from wms import db
 import datetime
 import os
 
-from wms.models import User, Task, Shift, Attendance, LeaveRequest, Salary, Document, Goal, Evaluation, Announcement, Message
-from wms.forms import RegistrationForm, LoginForm, TaskForm, ShiftForm, LeaveRequestForm, EmptyForm, SalaryForm, DocumentForm, GoalForm, EvaluationForm, AnnouncementForm, MessageForm
+from wms.models import User, Task, Shift, Attendance, LeaveRequest, Document, Goal, Evaluation, Announcement, Message
+from wms.forms import RegistrationForm, LoginForm, TaskForm, ShiftForm, LeaveRequestForm, EmptyForm, DocumentForm, GoalForm, EvaluationForm, AnnouncementForm, MessageForm
 from .decorators import roles_required
-from .payroll import calculate_overtime
 from werkzeug.utils import secure_filename
 from flask import current_app
 from sqlalchemy import or_
