@@ -8,8 +8,9 @@ from wms.models import User, Task, Shift, Attendance, LeaveRequest, Document, Go
 from wms.forms import RegistrationForm, LoginForm, TaskForm, ShiftForm, LeaveRequestForm, EmptyForm, DocumentForm, GoalForm, EvaluationForm, AnnouncementForm, MessageForm
 from .decorators import roles_required
 from werkzeug.utils import secure_filename
-from flask import current_app
+from flask import current_app, jsonify
 from sqlalchemy import or_
+import json
 
 main_bp = Blueprint('main', __name__)
 
@@ -201,6 +202,29 @@ def documents():
 def my_payslips():
     payslips = Document.query.filter_by(user=current_user, category='Payslip').order_by(Document.upload_date.desc()).all()
     return render_template('my_payslips.html', title='My Payslips', payslips=payslips)
+
+
+@main_bp.route("/analytics")
+@login_required
+@roles_required('Admin', 'Manager')
+def analytics():
+    # Calculate total hours worked by each employee
+    users = User.query.all()
+    attendance_data = {}
+    for user in users:
+        total_duration = datetime.timedelta(0)
+        records = Attendance.query.filter_by(user_id=user.id).all()
+        for record in records:
+            if record.clock_in_time and record.clock_out_time:
+                total_duration += record.clock_out_time - record.clock_in_time
+        attendance_data[user.username] = total_duration.total_seconds() / 3600
+
+    chart_data = {
+        'labels': list(attendance_data.keys()),
+        'data': list(attendance_data.values()),
+    }
+
+    return render_template('analytics.html', title='Analytics Dashboard', chart_data=json.dumps(chart_data))
 
 
 @main_bp.route("/goal/new", methods=['GET', 'POST'])
