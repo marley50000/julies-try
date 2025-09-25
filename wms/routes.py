@@ -4,8 +4,8 @@ from wms import db
 import datetime
 import os
 
-from wms.models import User, Task, Shift, Attendance, LeaveRequest, Document, Goal, Evaluation, Announcement, Message
-from wms.forms import RegistrationForm, LoginForm, TaskForm, ShiftForm, LeaveRequestForm, EmptyForm, DocumentForm, GoalForm, EvaluationForm, AnnouncementForm, MessageForm
+from wms.models import User, Task, Shift, Attendance, LeaveRequest, Document, Goal, Evaluation, Announcement, Message, Asset, AssetLog
+from wms.forms import RegistrationForm, LoginForm, TaskForm, ShiftForm, LeaveRequestForm, EmptyForm, DocumentForm, GoalForm, EvaluationForm, AnnouncementForm, MessageForm, AssetForm
 from .decorators import roles_required
 from werkzeug.utils import secure_filename
 from flask import current_app, jsonify
@@ -349,3 +349,62 @@ def conversation(recipient_id):
     ).order_by(Message.timestamp.asc()).all()
 
     return render_template('conversation.html', title=f"Conversation with {recipient.username}", form=form, recipient=recipient, messages=messages)
+
+
+@main_bp.route("/assets")
+@login_required
+@roles_required('Admin', 'Manager')
+def assets():
+    all_assets = Asset.query.all()
+    form = EmptyForm()
+    return render_template('assets.html', title='Asset Management', assets=all_assets, form=form)
+
+
+@main_bp.route("/asset/new", methods=['GET', 'POST'])
+@login_required
+@roles_required('Admin', 'Manager')
+def new_asset():
+    form = AssetForm()
+    if form.validate_on_submit():
+        asset = Asset(name=form.name.data,
+                      description=form.description.data)
+        db.session.add(asset)
+        db.session.commit()
+        flash('The asset has been added.', 'success')
+        return redirect(url_for('main.assets'))
+    return render_template('create_asset.html', title='New Asset', form=form)
+
+
+@main_bp.route("/asset/<int:asset_id>/checkout", methods=['POST'])
+@login_required
+def checkout_asset(asset_id):
+    asset = Asset.query.get_or_404(asset_id)
+    if asset.status != 'Available':
+        flash('This asset is not available to be checked out.', 'danger')
+    else:
+        asset.status = 'Checked Out'
+        asset_log = AssetLog(user=current_user, asset=asset)
+        db.session.add(asset_log)
+        db.session.commit()
+        flash(f"You have checked out {asset.name}.", 'success')
+    return redirect(url_for('main.assets'))
+
+
+@main_bp.route("/asset/<int:asset_id>/checkin", methods=['POST'])
+@login_required
+def checkin_asset(asset_id):
+    asset = Asset.query.get_or_404(asset_id)
+    asset_log = AssetLog.query.filter_by(asset_id=asset.id, check_in_time=None).first()
+
+    if asset.status != 'Checked Out' or not asset_log:
+        flash('This asset cannot be checked in.', 'danger')
+    else:
+        if asset_log.user != current_user and current_user.role not in ['Admin', 'Manager']:
+            flash('You can only check in assets that you have checked out.', 'danger')
+        else:
+            asset.status = 'Available'
+            asset_log.check_in_time = datetime.datetime.utcnow()
+            db.session.commit()
+            flash(f"You have checked in {asset.name}.", 'success')
+
+    return redirect(url_for('main.assets'))

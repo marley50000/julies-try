@@ -4,7 +4,7 @@ from wtforms.validators import DataRequired, Length, Email, EqualTo, ValidationE
 from wtforms_sqlalchemy.fields import QuerySelectField
 from wtforms.fields import DateField, DateTimeField
 from flask_wtf.file import FileField, FileAllowed
-from wms.models import User
+from wms.models import User, Asset
 
 def user_query():
     return User.query
@@ -88,3 +88,9 @@ class AnnouncementForm(FlaskForm):
 class MessageForm(FlaskForm):
     content = TextAreaField('Message', validators=[DataRequired()])
     submit = SubmitField('Send')
+
+
+class AssetForm(FlaskForm):
+    name = StringField('Asset Name', validators=[DataRequired()])
+    description = TextAreaField('Description', validators=[Optional()])
+    submit = SubmitField('Save Asset')

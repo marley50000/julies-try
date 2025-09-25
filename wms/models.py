@@ -141,3 +141,26 @@ class Message(db.Model):
 
     def __repr__(self):
         return f"Message from '{self.sender.username}' to '{self.recipient.username}'"
+
+
+class Asset(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(100), nullable=False)
+    description = db.Column(Text, nullable=True)
+    status = db.Column(db.String(50), nullable=False, default='Available')  # Available, Checked Out, In Maintenance
+
+    def __repr__(self):
+        return f"Asset('{self.name}', '{self.status}')"
+
+
+class AssetLog(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    check_out_time = db.Column(db.DateTime, nullable=False, default=datetime.datetime.utcnow)
+    check_in_time = db.Column(db.DateTime, nullable=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    asset_id = db.Column(db.Integer, db.ForeignKey('asset.id'), nullable=False)
+    user = db.relationship('User', backref='asset_logs')
+    asset = db.relationship('Asset', backref='logs')
+
+    def __repr__(self):
+        return f"AssetLog('{self.asset.name}', '{self.user.username}', '{self.check_out_time}')"
