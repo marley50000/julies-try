@@ -1,0 +1,57 @@
+/* static/css/modern_canadian.css */
+body {
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    background-color: #f4f4f4;
+    color: #333;
+    margin: 0;
+    padding: 0;
+}
+
+.container {
+    display: flex;
+    max-width: 900px;
+    margin: 30px auto;
+    background: #fff;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+}
+
+.left-column {
+    width: 35%;
+    background: #333;
+    color: #fff;
+    padding: 30px;
+}
+
+.right-column {
+    width: 65%;
+    padding: 30px;
+}
+
+h1 {
+    font-size: 2em;
+    margin-bottom: 0;
+}
+
+h2 {
+    font-size: 1.5em;
+    border-bottom: 2px solid #333;
+    padding-bottom: 5px;
+    margin-top: 20px;
+}
+
+.left-column h2 {
+    border-bottom: 2px solid #fff;
+}
+
+.section {
+    margin-bottom: 20px;
+}
+
+ul {
+    list-style-type: none;
+    padding: 0;
+}
+
+li {
+    margin-bottom: 5px;
+}

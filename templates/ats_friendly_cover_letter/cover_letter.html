@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{{ name }} - Cover Letter</title>
+    <meta charset="UTF-8">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+        }
+        .section {
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div id="cover-letter">
+        <h1>{{ name }}</h1>
+        <p>{{ contact_info.email }} | {{ contact_info.phone }} | {{ contact_info.linkedin }} | {{ contact_info.github }}</p>
+
+        <div class="section">
+            <p>Date: {{ date }}</p>
+            <p>{{ hiring_manager_name }}</p>
+            <p>{{ company_name }}</p>
+            <p>{{ company_address }}</p>
+        </div>
+
+        <div class="section">
+            <p>Dear {{ hiring_manager_name }},</p>
+            <p>I am writing to express my interest in the {{ job_target }} position at {{ company_name }}.</p>
+            <p>{{ career_summary }}</p>
+            <p>I am confident that my skills in {{ skills | join(', ') }} and my experience in... make me a strong candidate for this role.</p>
+            <p>Thank you for your time and consideration. I look forward to hearing from you soon.</p>
+            <p>Sincerely,</p>
+            <p>{{ name }}</p>
+        </div>
+    </div>
+</body>
+</html>

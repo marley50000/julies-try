@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{{ name }} - Resume</title>
+    <meta charset="UTF-8">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+        }
+        h1, h2 {
+            border-bottom: 1px solid #000;
+            padding-bottom: 5px;
+        }
+        .section {
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div id="resume">
+        <h1>{{ name }}</h1>
+        <p>{{ contact_info.email }} | {{ contact_info.phone }} | {{ contact_info.linkedin }} | {{ contact_info.github }}</p>
+
+        <div class="section">
+            <h2>Career Summary</h2>
+            <p>{{ career_summary }}</p>
+        </div>
+
+        <div class="section">
+            <h2>Work Experience</h2>
+            {% for job in work_experience %}
+            <h3>{{ job.title }} at {{ job.company }}</h3>
+            <p>{{ job.start_date }} - {{ job.end_date }}</p>
+            <p>{{ job.description }}</p>
+            {% endfor %}
+        </div>
+
+        <div class="section">
+            <h2>Education</h2>
+            {% for edu in education %}
+            <h3>{{ edu.degree }}</h3>
+            <p>{{ edu.institution }} | {{ edu.start_date }} - {{ edu.end_date }}</p>
+            {% endfor %}
+        </div>
+
+        <div class="section">
+            <h2>Skills</h2>
+            <p>{{ skills | join(', ') }}</p>
+        </div>
+    </div>
+</body>
+</html>
