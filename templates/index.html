@@ -3,130 +3,183 @@
 <head>
     <meta charset="UTF-8">
     <title>Resume and Cover Letter Generator</title>
-    <style>
-        body { font-family: sans-serif; margin: 2em; }
-        form { display: grid; grid-template-columns: 1fr 2fr; gap: 1em; }
-        label { grid-column: 1; text-align: right; }
-        input, textarea, select { grid-column: 2; }
-        .full-width { grid-column: 1 / 3; }
-        fieldset { border: 1px solid #ccc; padding: 1em; margin-bottom: 1em; }
-        legend { font-weight: bold; }
-    </style>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/form.css') }}">
 </head>
 <body>
     <h1>Resume and Cover Letter Generator</h1>
     <form action="/generate" method="post">
-        <fieldset class="full-width">
+        <fieldset>
             <legend>Personal Information</legend>
-            <label for="name">Full Name:</label>
-            <input type="text" id="name" name="name" required>
+            <div class="form-grid">
+                <label for="name">Full Name:</label>
+                <input type="text" id="name" name="name" required>
 
-            <label for="email">Email:</label>
-            <input type="email" id="email" name="email" required>
+                <label for="email">Email:</label>
+                <input type="email" id="email" name="email" required>
 
-            <label for="phone">Phone:</label>
-            <input type="tel" id="phone" name="phone" required>
+                <label for="phone">Phone:</label>
+                <input type="tel" id="phone" name="phone" required>
 
-            <label for="linkedin">LinkedIn Profile:</label>
-            <input type="url" id="linkedin" name="linkedin">
+                <label for="linkedin">LinkedIn Profile:</label>
+                <input type="url" id="linkedin" name="linkedin" placeholder="https://linkedin.com/in/yourprofile">
 
-            <label for="github">GitHub Profile:</label>
-            <input type="url" id="github" name="github">
+                <label for="github">GitHub Profile:</label>
+                <input type="url" id="github" name="github" placeholder="https://github.com/yourusername">
+            </div>
         </fieldset>
 
-        <fieldset class="full-width">
+        <fieldset>
             <legend>Career Objective</legend>
-            <label for="career_summary">Career Summary:</label>
-            <textarea id="career_summary" name="career_summary" rows="4" required></textarea>
+            <div class="form-grid">
+                <label for="career_summary">Career Summary:</label>
+                <textarea id="career_summary" name="career_summary" rows="4" required></textarea>
 
-            <label for="job_target">Target Job Title:</label>
-            <input type="text" id="job_target" name="job_target" required>
+                <label for="job_target">Target Job Title:</label>
+                <input type="text" id="job_target" name="job_target" required>
+            </div>
         </fieldset>
 
-        <fieldset class="full-width">
+        <fieldset>
             <legend>Company Information (for Cover Letter)</legend>
-            <label for="date">Date:</label>
-            <input type="text" id="date" name="date" value="October 10, 2025" required>
+            <div class="form-grid">
+                <label for="date">Date:</label>
+                <input type="text" id="date" name="date" value="October 10, 2025" required>
 
-            <label for="hiring_manager_name">Hiring Manager's Name:</label>
-            <input type="text" id="hiring_manager_name" name="hiring_manager_name" required>
+                <label for="hiring_manager_name">Hiring Manager's Name:</label>
+                <input type="text" id="hiring_manager_name" name="hiring_manager_name" required>
 
-            <label for="company_name">Company Name:</label>
-            <input type="text" id="company_name" name="company_name" required>
+                <label for="company_name">Company Name:</label>
+                <input type="text" id="company_name" name="company_name" required>
 
-            <label for="company_address">Company Address:</label>
-            <input type="text" id="company_address" name="company_address" required>
+                <label for="company_address">Company Address:</label>
+                <input type="text" id="company_address" name="company_address" required>
+            </div>
         </fieldset>
 
-        <fieldset class="full-width">
+        <fieldset>
             <legend>Work Experience</legend>
-            <!-- JavaScript will add fields for work experience here -->
             <div id="work_experience_fields"></div>
-            <button type="button" onclick="addWorkExperience()">Add Work Experience</button>
+            <div class="form-grid">
+                <label></label> <!-- Empty label for alignment -->
+                <button type="button" onclick="addWorkExperience()">Add Work Experience</button>
+            </div>
         </fieldset>
 
-        <fieldset class="full-width">
+        <fieldset>
             <legend>Education</legend>
-            <!-- JavaScript will add fields for education here -->
             <div id="education_fields"></div>
-            <button type="button" onclick="addEducation()">Add Education</button>
+            <div class="form-grid">
+                <label></label> <!-- Empty label for alignment -->
+                <button type="button" onclick="addEducation()">Add Education</button>
+            </div>
         </fieldset>
 
-        <fieldset class="full-width">
+        <fieldset>
             <legend>Skills</legend>
-            <label for="skills">Skills (comma-separated):</label>
-            <input type="text" id="skills" name="skills" required>
+            <div class="form-grid">
+                <label for="skills">Skills (comma-separated):</label>
+                <input type="text" id="skills" name="skills" placeholder="e.g. Python, JavaScript, Project Management" required>
+            </div>
         </fieldset>
 
-        <fieldset class="full-width">
+        <fieldset>
             <legend>Document Selection</legend>
-            <label for="document_type">Document to Generate:</label>
-            <select id="document_type" name="document_type">
-                <option value="ats_resume">ATS-Friendly Resume</option>
-                <option value="ats_cover_letter">ATS-Friendly Cover Letter</option>
-                <option value="modern_canadian_resume">Modern Canadian Resume</option>
-                <option value="modern_canadian_cover_letter">Modern Canadian Cover Letter</option>
-            </select>
+            <div class="form-grid">
+                <label for="document_type">Document to Generate:</label>
+                <select id="document_type" name="document_type">
+                    <option value="ats_resume">ATS-Friendly Resume</option>
+                    <option value="ats_cover_letter">ATS-Friendly Cover Letter</option>
+                    <option value="modern_canadian_resume">Modern Canadian Resume</option>
+                    <option value="modern_canadian_cover_letter">Modern Canadian Cover Letter</option>
+                </select>
+            </div>
         </fieldset>
 
-        <div class="full-width" style="text-align: center;">
-            <button type="submit">Generate Document</button>
-        </div>
+        <button type="submit">Generate Document</button>
     </form>
 
     <script>
+        function createFormGrid(elements) {
+            const grid = document.createElement('div');
+            grid.className = 'form-grid';
+            elements.forEach(el => grid.appendChild(el));
+            return grid;
+        }
+
         function addWorkExperience() {
             const container = document.getElementById('work_experience_fields');
             const index = container.children.length;
-            const fields = `
-                <h4>Work Experience #${index + 1}</h4>
-                <label>Job Title:</label> <input type="text" name="work_experience-${index}-title" required>
-                <label>Company:</label> <input type="text" name="work_experience-${index}-company" required>
-                <label>Start Date:</label> <input type="text" name="work_experience-${index}-start_date" required>
-                <label>End Date:</label> <input type="text" name="work_experience-${index}-end_date" required>
-                <label>Description:</label> <textarea name="work_experience-${index}-description" rows="3" required></textarea>
-            `;
-            const div = document.createElement('div');
-            div.innerHTML = fields;
-            container.appendChild(div);
+            const wrapper = document.createElement('div');
+            wrapper.innerHTML = `<h4>Work Experience #${index + 1}</h4>`;
+
+            const fields = [
+                { label: 'Job Title:', name: `work_experience-${index}-title`, type: 'text' },
+                { label: 'Company:', name: `work_experience-${index}-company`, type: 'text' },
+                { label: 'Start Date:', name: `work_experience-${index}-start_date`, type: 'text' },
+                { label: 'End Date:', name: `work_experience-${index}-end_date`, type: 'text' },
+                { label: 'Description:', name: `work_experience-${index}-description`, type: 'textarea' }
+            ];
+
+            const grid = document.createElement('div');
+            grid.className = 'form-grid';
+
+            fields.forEach(field => {
+                const label = document.createElement('label');
+                label.textContent = field.label;
+
+                let input;
+                if (field.type === 'textarea') {
+                    input = document.createElement('textarea');
+                    input.rows = 3;
+                } else {
+                    input = document.createElement('input');
+                    input.type = field.type;
+                }
+                input.name = field.name;
+                input.required = true;
+
+                grid.appendChild(label);
+                grid.appendChild(input);
+            });
+
+            wrapper.appendChild(grid);
+            container.appendChild(wrapper);
         }
 
         function addEducation() {
             const container = document.getElementById('education_fields');
             const index = container.children.length;
-            const fields = `
-                <h4>Education #${index + 1}</h4>
-                <label>Degree:</label> <input type="text" name="education-${index}-degree" required>
-                <label>Institution:</label> <input type="text" name="education-${index}-institution" required>
-                <label>Start Date:</label> <input type="text" name="education-${index}-start_date" required>
-                <label>End Date:</label> <input type="text" name="education-${index}-end_date" required>
-            `;
-            const div = document.createElement('div');
-            div.innerHTML = fields;
-            container.appendChild(div);
+            const wrapper = document.createElement('div');
+            wrapper.innerHTML = `<h4>Education #${index + 1}</h4>`;
+
+            const fields = [
+                { label: 'Degree:', name: `education-${index}-degree`, type: 'text' },
+                { label: 'Institution:', name: `education-${index}-institution`, type: 'text' },
+                { label: 'Start Date:', name: `education-${index}-start_date`, type: 'text' },
+                { label: 'End Date:', name: `education-${index}-end_date`, type: 'text' }
+            ];
+
+            const grid = document.createElement('div');
+            grid.className = 'form-grid';
+
+            fields.forEach(field => {
+                const label = document.createElement('label');
+                label.textContent = field.label;
+
+                const input = document.createElement('input');
+                input.type = field.type;
+                input.name = field.name;
+                input.required = true;
+
+                grid.appendChild(label);
+                grid.appendChild(input);
+            });
+
+            wrapper.appendChild(grid);
+            container.appendChild(wrapper);
         }
 
-        // Add one of each by default
+        // Add one of each by default for convenience
         addWorkExperience();
         addEducation();
     </script>

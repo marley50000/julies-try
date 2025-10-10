@@ -3,52 +3,58 @@
 <head>
     <title>{{ name }} - Resume</title>
     <meta charset="UTF-8">
-    <link rel="stylesheet" href="static/css/modern_canadian.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/modern_canadian.css') }}">
 </head>
 <body>
     <div class="container">
-        <div class="left-column">
-            <h1>{{ name }}</h1>
-            <p>{{ job_target }}</p>
+        <!-- The resume is now a single column with a prominent header, which is more modern. -->
+        <div class="right-column" style="width: 100%;">
+            <header class="header">
+                <h1>{{ name }}</h1>
+                <p class="job-title">{{ job_target }}</p>
+                <div class="contact-info">
+                    <span>📧 {{ contact_info.email }}</span>
+                    <span>📞 {{ contact_info.phone }}</span>
+                    {% if contact_info.linkedin %}<span>🔗 {{ contact_info.linkedin }}</span>{% endif %}
+                    {% if contact_info.github %}<span>💻 {{ contact_info.github }}</span>{% endif %}
+                </div>
+            </header>
 
-            <div class="section">
-                <h2>Contact</h2>
-                <p>{{ contact_info.email }}</p>
-                <p>{{ contact_info.phone }}</p>
-                <p>{{ contact_info.linkedin }}</p>
-                <p>{{ contact_info.github }}</p>
-            </div>
-
-            <div class="section">
-                <h2>Skills</h2>
-                <ul>
-                    {% for skill in skills %}
-                    <li>{{ skill }}</li>
-                    {% endfor %}
-                </ul>
-            </div>
-        </div>
-        <div class="right-column">
-            <div class="section">
-                <h2>Career Summary</h2>
+            <div class="section summary">
+                <h2><span class="icon">👤</span> Career Summary</h2>
                 <p>{{ career_summary }}</p>
             </div>
 
             <div class="section">
-                <h2>Work Experience</h2>
+                <h2><span class="icon">💼</span> Work Experience</h2>
                 {% for job in work_experience %}
-                <h3>{{ job.title }}</h3>
-                <p><strong>{{ job.company }}</strong> | {{ job.start_date }} - {{ job.end_date }}</p>
-                <p>{{ job.description }}</p>
+                <div class="job">
+                    <h3>{{ job.title }}</h3>
+                    <p class="company">{{ job.company }}</p>
+                    <p class="date">{{ job.start_date }} - {{ job.end_date }}</p>
+                    <p class="description">{{ job.description }}</p>
+                </div>
                 {% endfor %}
             </div>
 
             <div class="section">
-                <h2>Education</h2>
+                <h2><span class="icon">🎓</span> Education</h2>
                 {% for edu in education %}
-                <h3>{{ edu.degree }}</h3>
-                <p><strong>{{ edu.institution }}</strong> | {{ edu.start_date }} - {{ edu.end_date }}</p>
+                <div class="edu-item">
+                    <h3>{{ edu.degree }}</h3>
+                    <p class="institution">{{ edu.institution }}</p>
+                    <p class="date">{{ edu.start_date }} - {{ edu.end_date }}</p>
+                </div>
                 {% endfor %}
+            </div>
+
+            <div class="section">
+                <h2><span class="icon">🛠️</span> Skills</h2>
+                 <ul class="skills-list" style="display: flex; flex-wrap: wrap; gap: 0.5em;">
+                    {% for skill in skills %}
+                    <li style="background: var(--primary-color); color: var(--white);">{{ skill }}</li>
+                    {% endfor %}
+                </ul>
             </div>
         </div>
     </div>
