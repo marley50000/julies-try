@@ -79,7 +79,7 @@
 
         <fieldset>
             <legend>Skills</legend>
-            <div class="form-grid">
+            <div class.form-grid">
                 <label for="skills">Skills (comma-separated):</label>
                 <input type="text" id="skills" name="skills" placeholder="e.g. Python, JavaScript, Project Management" required>
             </div>
@@ -90,7 +90,8 @@
             <div class="form-grid">
                 <label for="document_type">Document to Generate:</label>
                 <select id="document_type" name="document_type">
-                    <option value="modern_professional_resume" {% if selected_template == 'modern_professional_resume' %}selected{% endif %}>Modern Professional Resume (New)</option>
+                    <option value="elegant_professional_resume" {% if selected_template == 'elegant_professional_resume' %}selected{% endif %}>Elegant Professional Resume (New)</option>
+                    <option value="modern_professional_resume" {% if selected_template == 'modern_professional_resume' %}selected{% endif %}>Modern Professional Resume</option>
                     <option value="ats_resume" {% if selected_template == 'ats_resume' %}selected{% endif %}>ATS-Friendly Resume</option>
                     <option value="ats_cover_letter" {% if selected_template == 'ats_cover_letter' %}selected{% endif %}>ATS-Friendly Cover Letter</option>
                     <option value="modern_canadian_resume" {% if selected_template == 'modern_canadian_resume' %}selected{% endif %}>Modern Canadian Resume</option>

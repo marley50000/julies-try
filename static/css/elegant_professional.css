@@ -1,0 +1,152 @@
+/* static/css/elegant_professional.css */
+@import url('https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap');
+
+:root {
+    --primary-font: 'Lato', sans-serif;
+    --accent-color: #345d7e; /* A muted, professional dark blue */
+    --text-color: #4a4a4a;
+    --heading-color: #2c3e50; /* A darker blue for headings */
+    --sidebar-bg: #f8f9fa; /* A very light grey for the sidebar */
+    --white: #ffffff;
+    --border-color: #e9ecef;
+}
+
+body {
+    font-family: var(--primary-font);
+    background-color: #e0e0e0;
+    color: var(--text-color);
+    margin: 0;
+    padding: 0;
+    font-size: 11pt;
+    font-weight: 400;
+}
+
+.container {
+    display: flex;
+    width: 210mm;
+    min-height: 297mm;
+    margin: 20px auto;
+    background: var(--white);
+    box-shadow: 0 0 20px rgba(0,0,0,0.15);
+}
+
+.sidebar {
+    width: 33%;
+    background-color: var(--sidebar-bg);
+    padding: 2.5em;
+    box-sizing: border-box;
+}
+
+.main-content {
+    width: 67%;
+    padding: 2.5em;
+    box-sizing: border-box;
+}
+
+/* Sidebar Styling */
+.profile-photo {
+    width: 140px;
+    height: 140px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin: 0 auto 2em auto;
+    display: block;
+    border: 6px solid var(--white);
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+}
+
+.sidebar h2 {
+    font-size: 1.1em;
+    font-weight: 700;
+    color: var(--accent-color);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 0.6em;
+    margin-top: 0;
+    margin-bottom: 1em;
+}
+
+.contact-info p {
+    margin: 0.8em 0;
+    line-height: 1.4;
+    word-break: break-all;
+}
+.contact-info p strong {
+    font-weight: 700;
+    color: var(--heading-color);
+}
+
+.skills-list {
+    list-style: none;
+    padding: 0;
+}
+.skills-list li {
+    margin-bottom: 0.7em;
+}
+
+/* Main Content Styling */
+.header {
+    text-align: left;
+    margin-bottom: 3em;
+}
+.header h1 {
+    font-size: 3.2em;
+    font-weight: 700;
+    color: var(--heading-color);
+    margin: 0;
+}
+.header .job-title {
+    font-size: 1.5em;
+    font-weight: 400;
+    color: var(--accent-color);
+    margin-top: 0.1em;
+}
+
+.main-content h2 {
+    font-size: 1.4em;
+    font-weight: 700;
+    color: var(--accent-color);
+    margin-bottom: 1em;
+    padding-bottom: 0.5em;
+    border-bottom: 2px solid var(--accent-color);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.section {
+    margin-bottom: 2.5em;
+}
+
+.job, .edu-item {
+    margin-bottom: 2em;
+    padding-left: 1em;
+    border-left: 2px solid var(--border-color);
+}
+.job:last-child, .edu-item:last-child {
+    margin-bottom: 0;
+}
+
+.job h3, .edu-item h3 {
+    font-size: 1.25em;
+    font-weight: 700;
+    color: var(--heading-color);
+    margin: 0;
+}
+.job .meta, .edu-item .meta {
+    font-size: 1em;
+    font-weight: 400;
+    color: var(--accent-color);
+    margin: 0.3em 0 0.8em 0;
+    display: block;
+}
+.job .description {
+    line-height: 1.6;
+    font-weight: 300;
+}
+.summary p {
+    line-height: 1.7;
+    font-size: 1.05em;
+    font-weight: 300;
+    margin: 0;
+}
