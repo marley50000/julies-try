@@ -7,7 +7,7 @@
 </head>
 <body>
     <h1>Resume and Cover Letter Generator</h1>
-    <form action="/generate" method="post">
+    <form action="/generate" method="post" enctype="multipart/form-data">
         <fieldset>
             <legend>Personal Information</legend>
             <div class="form-grid">
@@ -25,6 +25,9 @@
 
                 <label for="github">GitHub Profile:</label>
                 <input type="url" id="github" name="github" placeholder="https://github.com/yourusername">
+
+                <label for="passport_photo">Passport Photo:</label>
+                <input type="file" id="passport_photo" name="passport_photo" accept="image/png, image/jpeg">
             </div>
         </fieldset>
 
@@ -43,7 +46,7 @@
             <legend>Company Information (for Cover Letter)</legend>
             <div class="form-grid">
                 <label for="date">Date:</label>
-                <input type="text" id="date" name="date" value="October 10, 2025" required>
+                <input type="text" id="date" name="date" value="October 11, 2025" required>
 
                 <label for="hiring_manager_name">Hiring Manager's Name:</label>
                 <input type="text" id="hiring_manager_name" name="hiring_manager_name" required>
@@ -87,6 +90,7 @@
             <div class="form-grid">
                 <label for="document_type">Document to Generate:</label>
                 <select id="document_type" name="document_type">
+                    <option value="modern_professional_resume">Modern Professional Resume (New)</option>
                     <option value="ats_resume">ATS-Friendly Resume</option>
                     <option value="ats_cover_letter">ATS-Friendly Cover Letter</option>
                     <option value="modern_canadian_resume">Modern Canadian Resume</option>

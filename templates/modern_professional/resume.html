@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{{ name }} - Resume</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/modern_professional.css') }}">
+</head>
+<body>
+    <div class="container">
+        <aside class="sidebar">
+            {% if photo_path %}
+            <img src="{{ photo_path }}" alt="Passport Photo" class="profile-photo">
+            {% endif %}
+
+            <div class="section contact-info">
+                <h2>Contact</h2>
+                <p><strong>Email:</strong><br>{{ contact_info.email }}</p>
+                <p><strong>Phone:</strong><br>{{ contact_info.phone }}</p>
+                {% if contact_info.linkedin %}
+                <p><strong>LinkedIn:</strong><br>{{ contact_info.linkedin }}</p>
+                {% endif %}
+                {% if contact_info.github %}
+                <p><strong>GitHub:</strong><br>{{ contact_info.github }}</p>
+                {% endif %}
+            </div>
+
+            <div class="section">
+                <h2>Skills</h2>
+                <ul class="skills-list">
+                    {% for skill in skills %}
+                    <li>{{ skill }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </aside>
+
+        <main class="main-content">
+            <header class="header">
+                <h1>{{ name }}</h1>
+                <p class="job-title">{{ job_target }}</p>
+            </header>
+
+            <div class="section summary">
+                <h2>Summary</h2>
+                <p>{{ career_summary }}</p>
+            </div>
+
+            <div class="section">
+                <h2>Work Experience</h2>
+                {% for job in work_experience %}
+                <div class="job">
+                    <h3>{{ job.title }}</h3>
+                    <p class="company">{{ job.company }}</p>
+                    <p class="date">{{ job.start_date }} - {{ job.end_date }}</p>
+                    <p class="description">{{ job.description }}</p>
+                </div>
+                {% endfor %}
+            </div>
+
+            <div class="section">
+                <h2>Education</h2>
+                {% for edu in education %}
+                <div class="edu-item">
+                    <h3>{{ edu.degree }}</h3>
+                    <p class="institution">{{ edu.institution }}</p>
+                    <p class="date">{{ edu.start_date }} - {{ edu.end_date }}</p>
+                </div>
+                {% endfor %}
+            </div>
+        </main>
+    </div>
+</body>
+</html>

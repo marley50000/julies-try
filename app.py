@@ -1,8 +1,12 @@
 from flask import Flask, render_template, request, make_response
 from weasyprint import HTML, CSS
 import collections
+import os
+from werkzeug.utils import secure_filename
 
 app = Flask(__name__)
+UPLOAD_FOLDER = 'static/uploads'
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 def parse_dynamic_fields(form_data, prefix):
     """Parses dynamically added form fields (e.g., work_experience, education)."""
@@ -33,6 +37,19 @@ def generate():
     form_data = request.form.to_dict()
     document_type = form_data.get('document_type')
 
+    # Handle the file upload
+    photo_path = None
+    if 'passport_photo' in request.files:
+        photo = request.files['passport_photo']
+        if photo.filename != '':
+            filename = secure_filename(photo.filename)
+            # Use an absolute path for saving the file
+            save_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), app.config['UPLOAD_FOLDER'], filename)
+            photo.save(save_path)
+            # Use a relative path for the template
+            photo_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+
+
     # Prepare the context dictionary for rendering
     context = {
         "name": form_data.get('name'),
@@ -51,10 +68,12 @@ def generate():
         "skills": [skill.strip() for skill in form_data.get('skills', '').split(',')],
         "work_experience": parse_dynamic_fields(form_data, 'work_experience'),
         "education": parse_dynamic_fields(form_data, 'education'),
+        "photo_path": photo_path,
     }
 
     # Determine which template to render
     template_map = {
+        "modern_professional_resume": "modern_professional/resume.html",
         "ats_resume": "ats_friendly/resume.html",
         "ats_cover_letter": "ats_friendly_cover_letter/cover_letter.html",
         "modern_canadian_resume": "modern_canadian/resume.html",
@@ -69,7 +88,6 @@ def generate():
     rendered_html = render_template(template_name, **context)
 
     # Convert HTML to PDF using WeasyPrint
-    # Note: We need to provide the base_url for WeasyPrint to find the static CSS file.
     base_url = request.url_root
     pdf = HTML(string=rendered_html, base_url=base_url).write_pdf()
 
