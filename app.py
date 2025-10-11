@@ -45,7 +45,12 @@ def generate():
         photo = request.files['passport_photo']
         if photo.filename != '':
             filename = secure_filename(photo.filename)
+            # Use an absolute path for saving the file
             save_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), app.config['UPLOAD_FOLDER'], filename)
+
+            # **FIX:** Ensure the upload directory exists before saving.
+            os.makedirs(os.path.dirname(save_path), exist_ok=True)
+
             photo.save(save_path)
             # Create a URL path for the template, not a file system path
             photo_path = url_for('static', filename=f'uploads/{filename}')
