@@ -73,12 +73,13 @@ def generate():
     }
 
     template_map = {
+        "creative_professional_resume": "creative_professional/resume.html",
         "elegant_professional_resume": "elegant_professional/resume.html",
         "modern_professional_resume": "modern_professional/resume.html",
         "ats_resume": "ats_friendly/resume.html",
-        "ats_cover_letter": "ats_friendly_cover_letter/cover_letter.html",
+        "ats_cover_letter": "ats_friendly/cover_letter.html",
         "modern_canadian_resume": "modern_canadian/resume.html",
-        "modern_canadian_cover_letter": "modern_canadian_cover_letter/cover_letter.html",
+        "modern_canadian_cover_letter": "modern_canadian_cover_letter.html",
     }
 
     template_name = template_map.get(document_type)

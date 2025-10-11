@@ -1,0 +1,154 @@
+/* static/css/creative_professional.css */
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&family=Source+Sans+Pro:wght@400;600&display=swap');
+
+:root {
+    --heading-font: 'Montserrat', sans-serif;
+    --body-font: 'Source Sans Pro', sans-serif;
+    --sidebar-bg: #1a237e; /* A deep, professional navy blue */
+    --main-bg: #ffffff;
+    --text-color-light: #ffffff;
+    --text-color-dark: #333333;
+    --accent-color: #ffc107; /* A vibrant accent for contrast */
+}
+
+body {
+    font-family: var(--body-font);
+    background-color: #dcdcdc;
+    color: var(--text-color-dark);
+    margin: 0;
+    padding: 0;
+    font-size: 11pt;
+}
+
+.container {
+    display: flex;
+    width: 210mm;
+    min-height: 297mm;
+    margin: 20px auto;
+    background: var(--main-bg);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+}
+
+.sidebar {
+    width: 35%;
+    background-color: var(--sidebar-bg);
+    color: var(--text-color-light);
+    padding: 2.5em;
+    box-sizing: border-box;
+}
+
+.main-content {
+    width: 65%;
+    padding: 2.5em;
+    box-sizing: border-box;
+}
+
+/* Sidebar Styling */
+.profile-photo {
+    width: 160px;
+    height: 160px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin: 0 auto 1.5em auto;
+    display: block;
+    border: 5px solid var(--accent-color);
+}
+
+.sidebar-header {
+    text-align: center;
+    margin-bottom: 2em;
+}
+
+.sidebar-header h1 {
+    font-family: var(--heading-font);
+    font-size: 2.2em;
+    font-weight: 700;
+    margin: 0.5em 0 0.1em 0;
+}
+
+.sidebar-header .job-title {
+    font-size: 1.2em;
+    font-weight: 400;
+    color: var(--accent-color);
+    margin: 0;
+}
+
+.sidebar-section {
+    margin-bottom: 2em;
+}
+
+.sidebar-section h2 {
+    font-family: var(--heading-font);
+    font-size: 1.3em;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: var(--accent-color);
+    border-bottom: 2px solid var(--accent-color);
+    padding-bottom: 0.5em;
+    margin-bottom: 1em;
+}
+
+.contact-info p {
+    margin: 0.8em 0;
+    word-break: break-all;
+    display: flex;
+    align-items: center;
+}
+.contact-info .icon {
+    margin-right: 0.8em;
+    width: 20px;
+    text-align: center;
+    color: var(--accent-color);
+}
+
+.skills-list {
+    list-style: none;
+    padding: 0;
+}
+.skills-list li {
+    margin-bottom: 0.7em;
+}
+
+/* Main Content Styling */
+.main-content h2 {
+    font-family: var(--heading-font);
+    font-size: 1.8em;
+    font-weight: 700;
+    color: var(--sidebar-bg);
+    text-transform: uppercase;
+    margin-bottom: 1em;
+}
+
+.section {
+    margin-bottom: 2.5em;
+}
+
+.job, .edu-item {
+    margin-bottom: 2em;
+}
+.job:last-child, .edu-item:last-child {
+    margin-bottom: 0;
+}
+
+.job h3, .edu-item h3 {
+    font-family: var(--heading-font);
+    font-size: 1.3em;
+    font-weight: 700;
+    color: var(--text-color-dark);
+    margin: 0;
+}
+.job .meta, .edu-item .meta {
+    font-size: 1em;
+    font-weight: 600;
+    color: var(--sidebar-bg);
+    margin: 0.3em 0 0.8em 0;
+    display: block;
+}
+.job .description {
+    line-height: 1.6;
+}
+.summary p {
+    line-height: 1.7;
+    font-size: 1.05em;
+    margin: 0;
+}
