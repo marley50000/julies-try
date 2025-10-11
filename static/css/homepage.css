@@ -1,0 +1,77 @@
+/* static/css/homepage.css */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap');
+
+:root {
+    --primary-font: 'Poppins', sans-serif;
+    --bg-color: #f4f7f6;
+    --header-bg: #2c3e50;
+    --card-bg: #ffffff;
+    --text-color: #333;
+    --white: #ffffff;
+    --shadow-color: rgba(0,0,0,0.1);
+}
+
+body {
+    font-family: var(--primary-font);
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    margin: 0;
+}
+
+.hero {
+    background-color: var(--header-bg);
+    color: var(--white);
+    text-align: center;
+    padding: 4em 2em;
+}
+
+.hero h1 {
+    font-size: 3em;
+    font-weight: 700;
+    margin: 0 0 0.2em 0;
+}
+
+.hero p {
+    font-size: 1.2em;
+    font-weight: 400;
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.template-gallery {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 2em;
+    padding: 3em;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.template-card {
+    background-color: var(--card-bg);
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 5px 15px var(--shadow-color);
+    text-decoration: none;
+    color: var(--text-color);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.template-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 15px 25px var(--shadow-color);
+}
+
+.template-card img {
+    width: 100%;
+    height: auto;
+    display: block;
+    border-bottom: 1px solid #eee;
+}
+
+.template-name {
+    padding: 1.5em;
+    font-size: 1.1em;
+    font-weight: 600;
+    text-align: center;
+}

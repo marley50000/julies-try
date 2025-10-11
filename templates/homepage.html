@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Select Your Template</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/homepage.css') }}">
+</head>
+<body>
+    <header class="hero">
+        <h1>Choose Your Professional Look</h1>
+        <p>Select a template below to get started with your resume or cover letter.</p>
+    </header>
+
+    <main class="template-gallery">
+        <a href="{{ url_for('show_form', template_name='modern_professional_resume') }}" class="template-card">
+            <img src="{{ url_for('static', filename='images/previews/modern_professional_resume.png') }}" alt="Modern Professional Resume Preview">
+            <div class="template-name">Modern Professional Resume</div>
+        </a>
+
+        <a href="{{ url_for('show_form', template_name='modern_canadian_resume') }}" class="template-card">
+            <img src="{{ url_for('static', filename='images/previews/modern_canadian_resume.png') }}" alt="Modern Canadian Resume Preview">
+            <div class="template-name">Modern Canadian Resume</div>
+        </a>
+
+        <a href="{{ url_for('show_form', template_name='ats_resume') }}" class="template-card">
+            <img src="{{ url_for('static', filename='images/previews/ats_resume.png') }}" alt="ATS-Friendly Resume Preview">
+            <div class="template-name">ATS-Friendly Resume</div>
+        </a>
+
+        <a href="{{ url_for('show_form', template_name='modern_canadian_cover_letter') }}" class="template-card">
+            <img src="{{ url_for('static', filename='images/previews/modern_canadian_cover_letter.png') }}" alt="Modern Canadian Cover Letter Preview">
+            <div class="template-name">Modern Canadian Cover Letter</div>
+        </a>
+    </main>
+</body>
+</html>

@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, make_response
+from flask import Flask, render_template, request, make_response, url_for
 from weasyprint import HTML, CSS
 import collections
 import os
@@ -11,7 +11,6 @@ app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 def parse_dynamic_fields(form_data, prefix):
     """Parses dynamically added form fields (e.g., work_experience, education)."""
     items = []
-    # Group fields by index (e.g., work_experience-0-title, work_experience-0-company)
     grouped_by_index = collections.defaultdict(dict)
     for key, value in form_data.items():
         if key.startswith(prefix):
@@ -20,16 +19,20 @@ def parse_dynamic_fields(form_data, prefix):
             field_name = parts[2]
             grouped_by_index[index][field_name] = value
 
-    # Convert the dictionary to a sorted list of items
     sorted_indices = sorted(grouped_by_index.keys())
     for index in sorted_indices:
         items.append(grouped_by_index[index])
     return items
 
 @app.route('/')
-def index():
-    """Renders the main form."""
-    return render_template('index.html')
+def homepage():
+    """Renders the new homepage with a template gallery."""
+    return render_template('homepage.html')
+
+@app.route('/form/<template_name>')
+def show_form(template_name):
+    """Renders the main form, pre-selecting the template."""
+    return render_template('index.html', selected_template=template_name)
 
 @app.route('/generate', methods=['POST'])
 def generate():
@@ -37,20 +40,16 @@ def generate():
     form_data = request.form.to_dict()
     document_type = form_data.get('document_type')
 
-    # Handle the file upload
     photo_path = None
     if 'passport_photo' in request.files:
         photo = request.files['passport_photo']
         if photo.filename != '':
             filename = secure_filename(photo.filename)
-            # Use an absolute path for saving the file
             save_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), app.config['UPLOAD_FOLDER'], filename)
             photo.save(save_path)
-            # Use a relative path for the template
-            photo_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+            # Create a URL path for the template, not a file system path
+            photo_path = url_for('static', filename=f'uploads/{filename}')
 
-
-    # Prepare the context dictionary for rendering
     context = {
         "name": form_data.get('name'),
         "contact_info": {
@@ -71,7 +70,6 @@ def generate():
         "photo_path": photo_path,
     }
 
-    # Determine which template to render
     template_map = {
         "modern_professional_resume": "modern_professional/resume.html",
         "ats_resume": "ats_friendly/resume.html",
@@ -84,14 +82,11 @@ def generate():
     if not template_name:
         return "Invalid document type selected.", 400
 
-    # Render the HTML from the template
     rendered_html = render_template(template_name, **context)
 
-    # Convert HTML to PDF using WeasyPrint
     base_url = request.url_root
     pdf = HTML(string=rendered_html, base_url=base_url).write_pdf()
 
-    # Create a response to send the PDF as a download
     response = make_response(pdf)
     response.headers['Content-Type'] = 'application/pdf'
     response.headers['Content-Disposition'] = f'attachment; filename={document_type}.pdf'
