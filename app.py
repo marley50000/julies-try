@@ -73,6 +73,7 @@ def generate():
     }
 
     template_map = {
+        "final_modern_resume": "final_modern/resume.html",
         "creative_professional_resume": "creative_professional/resume.html",
         "elegant_professional_resume": "elegant_professional/resume.html",
         "modern_professional_resume": "modern_professional/resume.html",

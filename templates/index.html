@@ -46,7 +46,7 @@
             <legend>Company Information (for Cover Letter)</legend>
             <div class="form-grid">
                 <label for="date">Date:</label>
-                <input type="text" id="date" name="date" value="October 11, 2025" required>
+                <input type="text" id="date" name="date" value="October 12, 2025" required>
 
                 <label for="hiring_manager_name">Hiring Manager's Name:</label>
                 <input type="text" id="hiring_manager_name" name="hiring_manager_name" required>
@@ -90,7 +90,8 @@
             <div class="form-grid">
                 <label for="document_type">Document to Generate:</label>
                 <select id="document_type" name="document_type">
-                    <option value="creative_professional_resume" {% if selected_template == 'creative_professional_resume' %}selected{% endif %}>Creative Professional Resume (New)</option>
+                    <option value="final_modern_resume" {% if selected_template == 'final_modern_resume' %}selected{% endif %}>Final Modern Resume (New)</option>
+                    <option value="creative_professional_resume" {% if selected_template == 'creative_professional_resume' %}selected{% endif %}>Creative Professional Resume</option>
                     <option value="elegant_professional_resume" {% if selected_template == 'elegant_professional_resume' %}selected{% endif %}>Elegant Professional Resume</option>
                     <option value="modern_professional_resume" {% if selected_template == 'modern_professional_resume' %}selected{% endif %}>Modern Professional Resume</option>
                     <option value="ats_resume" {% if selected_template == 'ats_resume' %}selected{% endif %}>ATS-Friendly Resume</option>

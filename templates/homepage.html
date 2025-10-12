@@ -12,9 +12,14 @@
     </header>
 
     <main class="template-gallery">
+        <a href="{{ url_for('show_form', template_name='final_modern_resume') }}" class="template-card">
+            <img src="https://via.placeholder.com/400x565.png/2d3748/ffffff?text=Final+Modern+CV" alt="Final Modern CV Preview">
+            <div class="template-name">Final Modern CV (New)</div>
+        </a>
+
         <a href="{{ url_for('show_form', template_name='creative_professional_resume') }}" class="template-card">
             <img src="https://via.placeholder.com/400x565.png/1a237e/ffffff?text=Creative+Professional" alt="Creative Professional Resume Preview">
-            <div class="template-name">Creative Professional Resume (New)</div>
+            <div class="template-name">Creative Professional Resume</div>
         </a>
 
         <a href="{{ url_for('show_form', template_name='elegant_professional_resume') }}" class="template-card">

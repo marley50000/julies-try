@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{{ name }} - Resume</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/final_modern.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+</head>
+<body>
+    <div class="container">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                {% if photo_path %}
+                <img src="{{ photo_path }}" alt="Professional Headshot" class="profile-photo">
+                {% endif %}
+                <h1>{{ name }}</h1>
+                <p class="job-title">{{ job-target }}</p>
+            </div>
+
+            <div class="sidebar-section contact-info">
+                <h2>Contact</h2>
+                <p><span class="icon"><i class="fas fa-phone"></i></span>{{ contact_info.phone }}</p>
+                <p><span class="icon"><i class="fas fa-envelope"></i></span>{{ contact_info.email }}</p>
+                {% if contact_info.linkedin %}
+                <p><span class="icon"><i class="fab fa-linkedin"></i></span>{{ contact_info.linkedin }}</p>
+                {% endif %}
+                {% if contact_info.github %}
+                <p><span class="icon"><i class="fab fa-github"></i></span>{{ contact_info.github }}</p>
+                {% endif %}
+            </div>
+
+            <div class="sidebar-section">
+                <h2>Skills</h2>
+                <ul class="skills-list">
+                    {% for skill in skills %}
+                    <li>{{ skill }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </aside>
+
+        <main class="main-content">
+            <div class="section summary">
+                <h2>Profile</h2>
+                <p>{{ career_summary }}</p>
+            </div>
+
+            <div class="section">
+                <h2>Experience</h2>
+                {% for job in work_experience %}
+                <div class="job">
+                    <h3>{{ job.title }}</h3>
+                    <span class="meta">{{ job.company }} | {{ job.start_date }} - {{ job.end_date }}</span>
+                    <p class="description">{{ job.description }}</p>
+                </div>
+                {% endfor %}
+            </div>
+
+            <div class="section">
+                <h2>Education</h2>
+                {% for edu in education %}
+                <div class="edu-item">
+                    <h3>{{ edu.degree }}</h3>
+                    <span class="meta">{{ edu.institution }} | {{ edu.start_date }} - {{ edu.end_date }}</span>
+                </div>
+                {% endfor %}
+            </div>
+        </main>
+    </div>
+</body>
+</html>
