@@ -94,3 +94,13 @@ class AssetForm(FlaskForm):
     name = StringField('Asset Name', validators=[DataRequired()])
     description = TextAreaField('Description', validators=[Optional()])
     submit = SubmitField('Save Asset')
+
+
+class PrintingJobForm(FlaskForm):
+    document_name = StringField('Document Name', validators=[DataRequired()])
+    is_double_sided = BooleanField('Double Sided')
+    is_color = BooleanField('Color')
+    cost = FloatField('Cost', validators=[DataRequired()])
+    user = QuerySelectField('Employee', query_factory=user_query, get_label='username', allow_blank=False,
+                            validators=[DataRequired()])
+    submit = SubmitField('Create Printing Job')

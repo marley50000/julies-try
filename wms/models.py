@@ -164,3 +164,17 @@ class AssetLog(db.Model):
 
     def __repr__(self):
         return f"AssetLog('{self.asset.name}', '{self.user.username}', '{self.check_out_time}')"
+
+
+class PrintingJob(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    document_name = db.Column(db.String(100), nullable=False)
+    print_time = db.Column(db.DateTime, nullable=False, default=datetime.datetime.utcnow)
+    is_double_sided = db.Column(db.Boolean, nullable=False, default=False)
+    is_color = db.Column(db.Boolean, nullable=False, default=False)
+    cost = db.Column(db.Float, nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    user = db.relationship('User', backref='printing_jobs')
+
+    def __repr__(self):
+        return f"PrintingJob('{self.document_name}', '{self.user.username}', '{self.print_time}')"

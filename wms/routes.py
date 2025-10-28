@@ -4,8 +4,8 @@ from wms import db
 import datetime
 import os
 
-from wms.models import User, Task, Shift, Attendance, LeaveRequest, Document, Goal, Evaluation, Announcement, Message, Asset, AssetLog
-from wms.forms import RegistrationForm, LoginForm, TaskForm, ShiftForm, LeaveRequestForm, EmptyForm, DocumentForm, GoalForm, EvaluationForm, AnnouncementForm, MessageForm, AssetForm
+from wms.models import User, Task, Shift, Attendance, LeaveRequest, Document, Goal, Evaluation, Announcement, Message, Asset, AssetLog, PrintingJob
+from wms.forms import RegistrationForm, LoginForm, TaskForm, ShiftForm, LeaveRequestForm, EmptyForm, DocumentForm, GoalForm, EvaluationForm, AnnouncementForm, MessageForm, AssetForm, PrintingJobForm
 from .decorators import roles_required
 from werkzeug.utils import secure_filename
 from flask import current_app, jsonify
@@ -388,6 +388,32 @@ def checkout_asset(asset_id):
         db.session.commit()
         flash(f"You have checked out {asset.name}.", 'success')
     return redirect(url_for('main.assets'))
+
+
+@main_bp.route("/printing/new", methods=['GET', 'POST'])
+@login_required
+@roles_required('Admin', 'Manager')
+def new_printing_job():
+    form = PrintingJobForm()
+    if form.validate_on_submit():
+        printing_job = PrintingJob(document_name=form.document_name.data,
+                                   is_double_sided=form.is_double_sided.data,
+                                   is_color=form.is_color.data,
+                                   cost=form.cost.data,
+                                   user=form.user.data)
+        db.session.add(printing_job)
+        db.session.commit()
+        flash('The printing job has been created!', 'success')
+        return redirect(url_for('main.printing_jobs'))
+    return render_template('create_printing_job.html', title='New Printing Job', form=form, legend='New Printing Job')
+
+
+@main_bp.route("/printing")
+@login_required
+@roles_required('Admin', 'Manager')
+def printing_jobs():
+    jobs = PrintingJob.query.all()
+    return render_template('printing_jobs.html', title='Printing Jobs', jobs=jobs)
 
 
 @main_bp.route("/asset/<int:asset_id>/checkin", methods=['POST'])
